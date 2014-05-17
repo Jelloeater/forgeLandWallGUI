@@ -3,10 +3,12 @@ from Tkinter import *
 def Pressed():                          #function
 	print 'buttons are cool'
 	print(v.get())
+	if v.get():
+		print("cat")
 
 root = Tk()                             #main window
 
-v = BooleanVar()
+v = IntVar()
 c = Checkbutton(root, text="Don't show this again", variable=v)
 
 c.pack()
