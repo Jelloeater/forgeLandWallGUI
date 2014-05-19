@@ -1,35 +1,69 @@
-from sys import version_info
+from Tkinter import *
 
-try:
-	from tkinter import *
-except ImportError:
-	from Tkinter import *
 
-def Pressed():                          #function
-	print ('buttons are cool')
-	print(v.get())
-	if v.get():
-		print("cat")
-		newWindow = Tk()
-		l = Label(newWindow,text="LOL")
-		l.pack()
-		list = Listbox(newWindow)
-		stuff=[1,2]
-		for x in stuff:
-			list.insert(0,x)
-		list.pack()
+class AppUI(Frame):
 
-root = Tk()                             #main window
+	def menuBar(self):
+		self.menubar = Menu(self)
+		menu = Menu(self.menubar, tearoff=0)
+		self.menubar.add_cascade(label="File", menu=menu)
+		menu.add_command(label="Quit", command=self.Exit)
+		menu = Menu(self.menubar, tearoff=0)
+		self.menubar.add_cascade(label="Edit", menu=menu)
+		menu.add_command(label="Cut", command=self.Pressed)
+		menu.add_command(label="Copy")
+		menu.add_command(label="Paste")
+		self.master.config(menu=self.menubar)
 
-v = IntVar()
-c = Checkbutton(root, text="Don't show this again", variable=v)
+	def Exit(self):
+		root.destroy()
 
-c.pack()
 
-button = Button(root, command = Pressed)
-button.pack()
+	def __init__(self, master=None):
+		Frame.__init__(self, master, relief=SUNKEN, bd=2)
+
+		self.menuBar()
+
+		self.v = IntVar()
+		c = Checkbutton(root, text="Don't show this again", variable=self.v)
+
+		c.grid()
+
+		button = Button(root, text = 'Press Me', command = self.Pressed)
+		button.grid()
+
+		b=quitButton(root)
+		b.grid()
+	def Pressed(self):                          #function
+		print 'buttons are cool'
+		print(self.v.get())
+		if self.v.get():
+			print("cat")
+			new = Tk()
+			box = Canvas(new)
+			box.grid()
+
+
+# Create a class that specializing the Button class from the tkinter
+class quitButton(Button):
+
+	def __init__(self, parent):
+		Button.__init__(self, parent)
+		# Change the message here
+		self['text'] = 'Good Bye'
+		# Command to close the window (the destory method)
+		self['command'] = parent.destroy
+		self.pack(side=BOTTOM)
+
+
+
+
+
+
+
+root = Tk()
+app = AppUI(root)
+app.grid()
 
 root.mainloop()
 
-
-# https://wiki.python.org/moin/Intro%20to%20programming%20with%20Python%20and%20Tkinter
