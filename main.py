@@ -16,24 +16,53 @@ class AppUI(Frame,Button):
 		#
 		# button = Button(root, text = 'Press Me', command = self.Pressed)
 		# button.grid(column=2, sticky='WE')
-		autoRefresh(self)
-		# autoRefresh(root)
-		# quitButton(root)
-		#
-		# quitButton(root)
-		quitButton(self)
-		self.obj = label(self)
-		# obj.changeVariable("meowwww")
-		self.obj.labelText.set("catsssss")
-		# print(obj.labelText.get())
-		w = Label(self, text="12321")
-		w.grid()
 
 		newlab = Label()
 		newlab.labelText = StringVar()
 		newlab['textvariable'] = newlab.labelText
 		newlab.grid(sticky='nsew')
 		newlab.labelText.set("meowwwwwwe34")
+
+		newlab2 = Button()
+		newlab2.labelText = StringVar()
+		newlab2['textvariable'] = newlab2.labelText
+		newlab2.grid(sticky='nsew')
+		newlab2.labelText.set("cats22")
+		newlab2['command'] = lambda: newlab2.labelText.set(newlab2.labelText.get() + "I'mma cat too")
+
+		newlab3 = Button()
+		newlab3.labelText = StringVar()
+		newlab3['textvariable'] = newlab3.labelText
+		newlab3.grid(sticky='nsew')
+		newlab3.labelText.set("cats1232222")
+		newlab3['command'] = lambda: newlab3.labelText.set(newlab2.labelText.get() + "I'mma cat too")
+
+
+
+
+		autoRefresh(self)
+		# autoRefresh(root)
+		# quitButton(root)
+		#
+		# quitButton(root)
+		quitButton(self)
+
+		self.obj = label(self)
+		# obj.changeVariable("meowwww")
+		self.obj.labelText.set("catsssss")
+		# print(obj.labelText.get())
+
+
+
+		def sayHi(name):
+			print 'hello,', name
+
+		btnaText='ButtonA'
+		btna = Button(root, text = btnaText, command = lambda: sayHi(btnaText))
+		btnaText = "fuck man"
+		btna.grid()
+
+
 
 
 
@@ -62,12 +91,15 @@ class AppUI(Frame,Button):
 		app.grid()
 
 
-class label(Label,AppUI):
+class label(Label):
 	def __init__(self, parent):
 		Label.__init__(self, parent)
 		self.labelText = StringVar()
 		self['textvariable'] = self.labelText
 		self.grid(sticky='nsew')
+
+	def setText(self, text):
+		self.labelText = text
 
 
 class autoRefresh(Checkbutton):
