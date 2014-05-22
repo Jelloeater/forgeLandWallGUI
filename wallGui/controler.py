@@ -1,10 +1,13 @@
 __author__ = 'Jesse'
-from settings import *
 
-class messageList(web):
-	def getMessagesFromServer(cls,numberToGet):
-		rawJson = urllib.urlopen(web.serverAddress+'get/'+str(numberToGet))
-		print(rawJson)
+from model import message
+
+class messageController(message):
+	""" Mediates communication and unifies validation, using direct calls """
+	@classmethod
+	def loadMessages(cls,numberToGet):
+		""" Calls the message table population method"""
+		message.getMessagesFromServer()
 
 
 
