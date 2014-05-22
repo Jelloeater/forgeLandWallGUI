@@ -1,4 +1,6 @@
 __author__ = 'Jesse'
+import logging
+logging.basicConfig(format="[%(asctime)s] [%(levelname)8s] --- %(message)s (%(filename)s:%(lineno)s)", level=logging.DEBUG)
 
 class webSettings:
 	serverIp = '192.168.1.165'

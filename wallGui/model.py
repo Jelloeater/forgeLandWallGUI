@@ -2,7 +2,7 @@ __author__ = 'Jesse'
 from settings import webSettings
 import requests as Requests
 import json
-
+import logging
 
 class message(webSettings):
 	""" The Data"""
@@ -15,6 +15,11 @@ class message(webSettings):
 	@classmethod
 	def getMessagesFromServer(cls, numberToGet):
 		""" Gets the messages from the server and loads them into the model """
+		logging.info("Getting " + str(numberToGet) + ' messages from ' + cls.serverAddress)
 		rawJSON = Requests.get(webSettings.serverAddress+'get/'+str(numberToGet))
-		messageList = json.loads(rawJSON)
+		messageList = json.loads(rawJSON.content)
+
+		logging.debug("Got messages")
+		return messageList # For testing and other neat things
+		# FIXME Load message list up with data
 
