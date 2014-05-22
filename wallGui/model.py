@@ -1,5 +1,7 @@
 __author__ = 'Jesse'
 from settings import webSettings
+import requests as Requests
+import json
 
 
 class message(webSettings):
@@ -11,7 +13,8 @@ class message(webSettings):
 		self.index = None
 
 	@classmethod
-	def getMessagesFromServer(cls):
+	def getMessagesFromServer(cls, numberToGet):
 		""" Gets the messages from the server and loads them into the model """
-		pass
+		rawJSON = Requests.get(webSettings.serverAddress+'get/'+str(numberToGet))
+		messageList = json.loads(rawJSON)
 
