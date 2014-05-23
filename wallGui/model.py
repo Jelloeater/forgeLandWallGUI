@@ -1,8 +1,8 @@
 __author__ = 'Jesse'
-from settings import webSettings
+from settings import settings
 
 
-class message(webSettings):
+class message(settings):
 	""" The Data"""
 
 	messageList = []

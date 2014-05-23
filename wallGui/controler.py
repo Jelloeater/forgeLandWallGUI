@@ -1,7 +1,7 @@
 import json
 import logging
 import requests as Requests
-from settings import webSettings
+from settings import settings
 
 __author__ = 'Jesse'
 
@@ -15,7 +15,7 @@ class messageController(message):
 		""" Gets the messages from the server and loads them into the model """
 		numberToGet = cls.numberOfMessagesToGet
 		logging.info("Getting " + str(numberToGet) + ' messages from ' + cls.serverAddress)
-		rawJSON = Requests.get(webSettings.serverAddress+'get/'+str(numberToGet))
+		rawJSON = Requests.get(settings.serverAddress+'get/'+str(numberToGet))
 		messageList = json.loads(rawJSON.content)
 
 		logging.debug("Got messages")
