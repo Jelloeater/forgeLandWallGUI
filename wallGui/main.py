@@ -2,68 +2,91 @@ from Tkinter import *
 import logging
 from controler import messageController
 
-class main(messageController):
-	@classmethod
-	def main(cls):
-		logging.debug("Started main program")
-		cls.refreshMessageList()
-		root = Tk()
-		root.columnconfigure(0, weight=1)
-		# root.rowconfigure(0, weight=1)
-		root.minsize(width=400, height=50)
-		root.title('Forge Land Message Editor ' + cls.versionNumber)
-		root.wm_iconbitmap(bitmap='images/icon.ico')
-
+class main(Frame, messageController):
+	def __init__(self, rootWindow):
+		Frame.__init__(self, root)
 		menuBar(root)
 
-		addNewMessageDialog(root)
+		self.topFrame = Frame()
+		entryBox = Entry(self.topFrame)
+		entryBox.pack(side='left', fill='x', expand='True')
 
-		messageList(root)
+
+		addMessage = Button(self.topFrame)
+		addMessage['text'] = 'Add New Message'
+		# addMessage['command'] = main.refreshMessageList
+		addMessage.pack(side='right', padx=10)
+		self.topFrame.pack(fill='x')
 
 
-		# root.grid()
-		root.mainloop()
+		self.canvas = Canvas(root, borderwidth=0)
+		self.frame = Frame(self.canvas)
+		self.vsb = Scrollbar(root, orient="vertical", command=self.canvas.yview)
+		self.canvas.configure(yscrollcommand=self.vsb.set)
 
-		logging.debug("EOP")
+		self.vsb.pack(side="right", fill="y")
+		self.canvas.pack(side="left", fill="both", expand=True)
+		self.canvas.create_window((4,4), window=self.frame, anchor="nw", tags="self.frame")
+		self.frame.bind("<Configure>", self.OnFrameConfigure)
 
-class addNewMessageDialog(Frame, main):
-	def __init__(self, parent, **kw):
-		Frame.__init__(self, parent, **kw)
+		self.messageListBox()
+
+
+	def messageListBox(self):
+		messagesToLoad = ["dasadsdsadsadsadssadads", "dasadsdsadsaddsadsdassadads", "fjdjd"]
+
+		c = 1
+		for i in messagesToLoad:
+			messageText = Label(self.frame)
+			messageText['text'] = i
+			messageText.grid(column=0, row=c, sticky='w', padx=10)
+
+			editButton = Button(self.frame)
+			editButton['text'] = 'Edit'
+			editButton.grid(column=1, row=c, sticky='e')
+
+			deleteButton = Button(self.frame)
+			deleteButton['text'] = 'Delete'
+			deleteButton.grid(column=2, row=c, sticky='e', padx=10)
+			c += c
+
+	def OnFrameConfigure(self, event):
+		'''Reset the scroll region to encompass the inner frame'''
+		self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+
+
+
+	def addNewMessageDialog(self):
 
 		entryBox = Entry()
 		entryBox.grid(column=0, row=0, sticky='ew', pady=5)
 
-		addMessage = Button(parent)
+		addMessage = Button()
 		addMessage['text'] = 'Add New Message'
 		# addMessage['command'] = main.refreshMessageList
-		addMessage.grid(column=1, row=0, sticky='', padx=10, pady=5)
+		addMessage.grid(column=1, row=0, sticky='n', padx=10, pady=10)
 
 
-class messageList(Frame, main):
+class messageList(Canvas, main):
 	def __init__(self, parent, **kw):
-		Frame.__init__(self, parent, **kw)
+		Canvas.__init__(self, parent, **kw)
 
-		messagesToLoad = ["1", "2", "3"]
+		messagesToLoad = ["dasadsdsadsadsadsadsadsadsdasdsaadsadsdassadads", "dasadsdsadsadsadsadsadsadsdasdsaadsadsdassadads", "dasadsdsadsadsadsadsadsadsdasdsaadsadsdassadads"]
 
+		c = 1
 		for i in messagesToLoad:
-			messageItem(parent, messageIn=i)
+			messageText = Label()
+			messageText['text'] = i
+			messageText.grid(column=0, row=c, sticky='w', padx=10)
 
+			editButton = Button()
+			editButton['text'] = 'Edit'
+			editButton.grid(column=1, row=c, sticky='we')
 
-
-class messageItem(Frame, main):
-	def __init__(self, parent, messageIn, **kw):
-		Frame.__init__(self, parent, **kw)
-		messageText = Label()
-		messageText['text'] = messageIn
-		messageText.grid(column=0, sticky='n')
-
-		editButton = Button()
-		editButton['text'] = 'Edit'
-		editButton.grid(column=1, sticky='n')
-
-		deleteButton = Button()
-		deleteButton['text'] = 'Delete'
-		deleteButton.grid(column=2, sticky='n')
+			deleteButton = Button()
+			deleteButton['text'] = 'Delete'
+			deleteButton.grid(column=2, row=c, sticky='we', padx=10)
+			c += c
 
 
 class menuBar(Menu):
@@ -84,4 +107,14 @@ class menuBar(Menu):
 		self.master.config(menu=self.menubar)
 
 
-main.main()
+if __name__ == "__main__":
+	logging.debug("Started main program")
+	root = Tk()
+	root.columnconfigure(0, weight=1)
+	# root.rowconfigure(0, weight=1)
+	root.minsize(width=400, height=50)
+	root.title('Forge Land Message Editor ' + main.versionNumber)
+	root.wm_iconbitmap(bitmap='images/icon.ico')
+	main(root).grid()
+	root.mainloop()
+	logging.debug("EOP")
