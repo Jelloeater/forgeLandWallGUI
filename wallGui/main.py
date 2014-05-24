@@ -35,20 +35,34 @@ class main(Frame, messageController):
 	def messageListBox(self):
 		messagesToLoad = ["dasadsdsadsadsadssadads", "dasadsdsadsaddsadsdassadads", "fjdjd"]
 
-		c = 1
+		# FIXME Get button instances
 		for i in messagesToLoad:
+			message = ''
+			r = messagesToLoad.index(i) + 1
+
 			messageText = Label(self.frame)
 			messageText['text'] = i
-			messageText.grid(column=0, row=c, sticky='w', padx=10)
+			messageText.grid(column=0, row=r, sticky='w', padx=10)
 
 			editButton = Button(self.frame)
+			indexVar = StringVar()
 			editButton['text'] = 'Edit'
-			editButton.grid(column=1, row=c, sticky='e')
+			editButton['command'] = lambda: self.editMessage(messagesToLoad[r-1])
+			editButton.grid(column=1, row=r, sticky='e')
 
 			deleteButton = Button(self.frame)
 			deleteButton['text'] = 'Delete'
-			deleteButton.grid(column=2, row=c, sticky='e', padx=10)
-			c += c
+			editButton['command'] = lambda: self.editMessage(r)
+			deleteButton.grid(column=2, row=r, sticky='e', padx=10)
+			logging.debug(i)
+			logging.debug(r)
+
+
+
+	@classmethod
+	def editMessage(cls, c):
+		print(c)
+
 
 	def OnFrameConfigure(self, event):
 		'''Reset the scroll region to encompass the inner frame'''
@@ -66,27 +80,6 @@ class main(Frame, messageController):
 		# addMessage['command'] = main.refreshMessageList
 		addMessage.grid(column=1, row=0, sticky='n', padx=10, pady=10)
 
-
-class messageList(Canvas, main):
-	def __init__(self, parent, **kw):
-		Canvas.__init__(self, parent, **kw)
-
-		messagesToLoad = ["dasadsdsadsadsadsadsadsadsdasdsaadsadsdassadads", "dasadsdsadsadsadsadsadsadsdasdsaadsadsdassadads", "dasadsdsadsadsadsadsadsadsdasdsaadsadsdassadads"]
-
-		c = 1
-		for i in messagesToLoad:
-			messageText = Label()
-			messageText['text'] = i
-			messageText.grid(column=0, row=c, sticky='w', padx=10)
-
-			editButton = Button()
-			editButton['text'] = 'Edit'
-			editButton.grid(column=1, row=c, sticky='we')
-
-			deleteButton = Button()
-			deleteButton['text'] = 'Delete'
-			deleteButton.grid(column=2, row=c, sticky='we', padx=10)
-			c += c
 
 
 class menuBar(Menu):
