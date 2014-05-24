@@ -9,23 +9,61 @@ class main(messageController):
 		cls.refreshMessageList()
 		root = Tk()
 		root.columnconfigure(0, weight=1)
-		root.rowconfigure(0, weight=1)
+		# root.rowconfigure(0, weight=1)
 		root.minsize(width=400, height=50)
 		root.title('Forge Land Message Editor ' + cls.versionNumber)
 		root.wm_iconbitmap(bitmap='images/icon.ico')
 
 		menuBar(root)
-		newMessageBox(root)
-		addMessage(root)
+
+		addNewMessageDialog(root)
+
+		messageList(root)
 
 
-
-
-
-		root.grid()
+		# root.grid()
 		root.mainloop()
 
 		logging.debug("EOP")
+
+class addNewMessageDialog(Frame, main):
+	def __init__(self, parent, **kw):
+		Frame.__init__(self, parent, **kw)
+
+		entryBox = Entry()
+		entryBox.grid(column=0, row=0, sticky='ew', pady=5)
+
+		addMessage = Button(parent)
+		addMessage['text'] = 'Add New Message'
+		# addMessage['command'] = main.refreshMessageList
+		addMessage.grid(column=1, row=0, sticky='', padx=10, pady=5)
+
+
+class messageList(Frame, main):
+	def __init__(self, parent, **kw):
+		Frame.__init__(self, parent, **kw)
+
+		messagesToLoad = ["1", "2", "3"]
+
+		for i in messagesToLoad:
+			messageItem(parent, messageIn=i)
+
+
+
+class messageItem(Frame, main):
+	def __init__(self, parent, messageIn, **kw):
+		Frame.__init__(self, parent, **kw)
+		messageText = Label()
+		messageText['text'] = messageIn
+		messageText.grid(column=0, sticky='n')
+
+		editButton = Button()
+		editButton['text'] = 'Edit'
+		editButton.grid(column=1, sticky='n')
+
+		deleteButton = Button()
+		deleteButton['text'] = 'Delete'
+		deleteButton.grid(column=2, sticky='n')
 
 
 class menuBar(Menu):
@@ -45,19 +83,5 @@ class menuBar(Menu):
 		editMenu.add_command(label="About")
 		self.master.config(menu=self.menubar)
 
-
-class addMessage(Button):
-	def __init__(self, parent):
-		Button.__init__(self, parent)
-		self['text'] = 'Add Message'
-		# self['command'] = main.refreshMessageList
-		# self['accelerator'] = "F5"
-		self.grid(column=1, row=0, sticky='', padx=10, pady=5)
-
-
-class newMessageBox(Entry):
-	def __init__(self, parent, **kw):
-		Entry.__init__(self, **kw)
-		self.grid(column=0, row=0, sticky='ew', padx=10, pady=5)
 
 main.main()
