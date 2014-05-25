@@ -2,6 +2,7 @@ from Tkinter import *
 import logging
 from controler import messageController
 
+
 class main(Frame, messageController):
 	def __init__(self, rootWindow):
 		Frame.__init__(self, root)
@@ -25,7 +26,6 @@ class main(Frame, messageController):
 		self.topFrame = Frame()
 		entryBox = Entry(self.topFrame)
 		entryBox.pack(side='left', fill='x', expand='True')
-
 
 		addMessage = Button(self.topFrame)
 		addMessage['text'] = 'Add New Message'
@@ -52,20 +52,16 @@ class main(Frame, messageController):
 
 		# Packs frame
 		self.messageListCanvas.pack(side="left", fill="both", expand=True)
-		self.messageListCanvas.create_window((4,4), window=self.messageListFrame, anchor="nw", tags="self.frame")
+		self.messageListCanvas.create_window((4, 4), window=self.messageListFrame, anchor="nw", tags="self.frame")
 		self.messageListFrame.bind("<Configure>", self.OnFrameConfigure)
 
 		self.messageListBox()
 
 	def messageListBox(self):
+		messagesToLoad = self.messageList  # Fetch Message List from model
 
-		messagesToLoad = self.messageList # Fetch Message List from model
-
-		# FIXME Get button instances
-		# http://tkinter.unpythonic.net/wiki/CallbackConfusion
-		# http://stackoverflow.com/questions/728356/dynamically-creating-a-menu-in-tkinter-lambda-expressions
 		for i in messagesToLoad:
-			rowToInsertAt = messagesToLoad.index(i) + 1
+			rowToInsertAt = messagesToLoad.index(i)
 
 			messageText = Label(self.messageListFrame)
 			messageText['text'] = i['message']
@@ -77,7 +73,6 @@ class main(Frame, messageController):
 
 			editButton = Button(self.messageListFrame)
 			editButton['text'] = 'Edit'
-			# editButton['command'] = lambda rowToInsertAt=rowToInsertAt: self.editMessage(messagesToLoad[rowToInsertAt-1])
 			editButton['command'] = lambda i=i: self.editMessage(i)
 			editButton.grid(column=2, row=rowToInsertAt, sticky='e')
 
@@ -85,35 +80,24 @@ class main(Frame, messageController):
 			deleteButton['text'] = 'Delete'
 			deleteButton['command'] = lambda i=i: self.deleteMessage(i)
 			deleteButton.grid(column=3, row=rowToInsertAt, sticky='e', padx=10)
-			# logging.debug(i)
-			# logging.debug(rowToInsertAt)
-
+		# logging.debug(i)
+		# logging.debug(rowToInsertAt)
 
 
 	def editMessage(self, c):
 		logging.debug('Editing: ' + str(c))
+
 		# TODO Write Edit function
 
-	def deleteMessage(self,c):
+	def deleteMessage(self, c):
 		logging.debug('Deleting: ' + str(c))
+
 		# TODO Write Delete Function
 
-
 	def OnFrameConfigure(self, event):
-		'''Reset the scroll region to encompass the inner frame'''
+		"""Reset the scroll region to encompass the inner frame"""
 		self.messageListCanvas.configure(scrollregion=self.messageListCanvas.bbox("all"))
 
-
-
-	def addNewMessageDialog(self):
-
-		entryBox = Entry()
-		entryBox.grid(column=0, row=0, sticky='ew', pady=5)
-
-		addMessage = Button()
-		addMessage['text'] = 'Add New Message'
-		# addMessage['command'] = main.refreshMessageList
-		addMessage.grid(column=1, row=0, sticky='n', padx=10, pady=10)
 
 	def refreshWindow(self):
 		logging.debug('Refreshing Message Window')
@@ -122,9 +106,6 @@ class main(Frame, messageController):
 		self.vsb.destroy()
 		self.hsb.destroy()
 		self.createMessageFrame()
-
-		# FIXME Refresh works, we are getting double scroll bars though
-
 
 if __name__ == "__main__":
 	logging.debug("Started main program")
@@ -136,4 +117,4 @@ if __name__ == "__main__":
 	root.wm_iconbitmap(bitmap='images/icon.ico')
 	main(root).grid()
 	root.mainloop()
-	logging.debug("EOP")
+	logging.debug("End Of Program")
