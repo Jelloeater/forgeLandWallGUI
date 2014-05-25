@@ -5,7 +5,20 @@ from controler import messageController
 class main(Frame, messageController):
 	def __init__(self, rootWindow):
 		Frame.__init__(self, root)
-		menuBar(root)
+
+		self.menuBar = Menu()
+		fileMenu = Menu(self.menuBar, tearoff=0)
+		self.menuBar.add_cascade(label="File", menu=fileMenu, underline=1)
+		fileMenu.add_command(label="Quit", command=root.destroy, underline=1)
+		optionsMenu = Menu(self.menuBar, tearoff=0)
+		self.menuBar.add_cascade(label="Options", menu=optionsMenu)
+		optionsMenu.add_command(label="Refresh", command=self.refreshWindow, underline=1)
+		optionsMenu.add_command(label="Server Settings")
+		editMenu = Menu(self.menuBar, tearoff=0)
+		self.menuBar.add_cascade(label="Help", menu=editMenu)
+		editMenu.add_command(label="Help")
+		editMenu.add_command(label="About")
+		self.master.config(menu=self.menuBar)
 
 		self.refreshMessageList()
 
@@ -20,21 +33,32 @@ class main(Frame, messageController):
 		addMessage.pack(side='right', padx=10)
 		self.topFrame.pack(fill='x')
 
+		self.createMessageFrame()
 
-		self.canvas = Canvas(root, borderwidth=0)
-		self.frame = Frame(self.canvas)
-		self.vsb = Scrollbar(root, orient="vertical", command=self.canvas.yview)
-		self.canvas.configure(yscrollcommand=self.vsb.set)
 
+	def createMessageFrame(self):
+		# Sets up frame
+		self.messageListCanvas = Canvas(root, borderwidth=0)
+		self.messageListFrame = Frame(self.messageListCanvas)
+
+		# Creates scroll bar
+		self.vsb = Scrollbar(root, orient="vertical", command=self.messageListCanvas.yview)
+		self.messageListCanvas.configure(yscrollcommand=self.vsb.set)
 		self.vsb.pack(side="right", fill="y")
-		self.canvas.pack(side="left", fill="both", expand=True)
-		self.canvas.create_window((4,4), window=self.frame, anchor="nw", tags="self.frame")
-		self.frame.bind("<Configure>", self.OnFrameConfigure)
+
+		self.hsb = Scrollbar(root, orient="horizontal", command=self.messageListCanvas.xview)
+		self.messageListCanvas.configure(xscrollcommand=self.hsb.set)
+		self.hsb.pack(side="bottom", fill="x")
+
+		# Packs frame
+		self.messageListCanvas.pack(side="left", fill="both", expand=True)
+		self.messageListCanvas.create_window((4,4), window=self.messageListFrame, anchor="nw", tags="self.frame")
+		self.messageListFrame.bind("<Configure>", self.OnFrameConfigure)
 
 		self.messageListBox()
 
-
 	def messageListBox(self):
+
 		messagesToLoad = self.messageList # Fetch Message List from model
 
 		# FIXME Get button instances
@@ -43,22 +67,27 @@ class main(Frame, messageController):
 		for i in messagesToLoad:
 			rowToInsertAt = messagesToLoad.index(i) + 1
 
-			messageText = Label(self.frame)
-			messageText['text'] = i
+			messageText = Label(self.messageListFrame)
+			messageText['text'] = i['message']
 			messageText.grid(column=0, row=rowToInsertAt, sticky='w', padx=10)
 
-			editButton = Button(self.frame)
+			timestampText = Label(self.messageListFrame)
+			timestampText['text'] = i['timestamp']
+			timestampText.grid(column=1, row=rowToInsertAt, sticky='e', padx=10)
+
+			editButton = Button(self.messageListFrame)
 			editButton['text'] = 'Edit'
 			# editButton['command'] = lambda rowToInsertAt=rowToInsertAt: self.editMessage(messagesToLoad[rowToInsertAt-1])
 			editButton['command'] = lambda i=i: self.editMessage(i)
-			editButton.grid(column=1, row=rowToInsertAt, sticky='e')
+			editButton.grid(column=2, row=rowToInsertAt, sticky='e')
 
-			deleteButton = Button(self.frame)
+			deleteButton = Button(self.messageListFrame)
 			deleteButton['text'] = 'Delete'
 			deleteButton['command'] = lambda i=i: self.deleteMessage(i)
-			deleteButton.grid(column=2, row=rowToInsertAt, sticky='e', padx=10)
-			logging.debug(i)
-			logging.debug(rowToInsertAt)
+			deleteButton.grid(column=3, row=rowToInsertAt, sticky='e', padx=10)
+			# logging.debug(i)
+			# logging.debug(rowToInsertAt)
+
 
 
 	def editMessage(self, c):
@@ -72,7 +101,7 @@ class main(Frame, messageController):
 
 	def OnFrameConfigure(self, event):
 		'''Reset the scroll region to encompass the inner frame'''
-		self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+		self.messageListCanvas.configure(scrollregion=self.messageListCanvas.bbox("all"))
 
 
 
@@ -86,22 +115,15 @@ class main(Frame, messageController):
 		# addMessage['command'] = main.refreshMessageList
 		addMessage.grid(column=1, row=0, sticky='n', padx=10, pady=10)
 
-class menuBar(Menu):
-	def __init__(self, parent, **kw):
-		Menu.__init__(self, parent)
-		self.menubar = Menu()
-		fileMenu = Menu(self.menubar, tearoff=0)
-		self.menubar.add_cascade(label="File", menu=fileMenu, underline=1)
-		fileMenu.add_command(label="Quit", command=parent.destroy, underline=1)
-		optionsMenu = Menu(self.menubar, tearoff=0)
-		self.menubar.add_cascade(label="Options", menu=optionsMenu)
-		optionsMenu.add_command(label="Refresh", command=main.refreshMessageList, underline=1)
-		optionsMenu.add_command(label="Server Settings")
-		editMenu = Menu(self.menubar, tearoff=0)
-		self.menubar.add_cascade(label="Help", menu=editMenu)
-		editMenu.add_command(label="Help")
-		editMenu.add_command(label="About")
-		self.master.config(menu=self.menubar)
+	def refreshWindow(self):
+		logging.debug('Refreshing Message Window')
+		self.refreshMessageList()
+		self.messageListCanvas.destroy()
+		self.vsb.destroy()
+		self.hsb.destroy()
+		self.createMessageFrame()
+
+		# FIXME Refresh works, we are getting double scroll bars though
 
 
 if __name__ == "__main__":
@@ -109,7 +131,7 @@ if __name__ == "__main__":
 	root = Tk()
 	root.columnconfigure(0, weight=1)
 	# root.rowconfigure(0, weight=1)
-	root.minsize(width=400, height=50)
+	root.minsize(width=250, height=50)
 	root.title('Forge Land Message Editor ' + main.versionNumber)
 	root.wm_iconbitmap(bitmap='images/icon.ico')
 	main(root).grid()

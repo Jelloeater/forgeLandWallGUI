@@ -18,7 +18,7 @@ class messageController(message):
 		rawJSON = Requests.get(settings.serverAddress+'get/'+str(numberToGet))
 		messageList = json.loads(rawJSON.content)
 
-		logging.debug("Got messages")
+		logging.debug("Got " + str(len(messageList)) + " message(s)")
 		message.messageList = messageList
 		return messageList  # For testing and other neat things
 
