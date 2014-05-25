@@ -7,6 +7,8 @@ class main(Frame, messageController):
 		Frame.__init__(self, root)
 		menuBar(root)
 
+		self.refreshMessageList()
+
 		self.topFrame = Frame()
 		entryBox = Entry(self.topFrame)
 		entryBox.pack(side='left', fill='x', expand='True')
@@ -33,35 +35,39 @@ class main(Frame, messageController):
 
 
 	def messageListBox(self):
-		messagesToLoad = ["dasadsdsadsadsadssadads", "dasadsdsadsaddsadsdassadads", "fjdjd"]
+		messagesToLoad = self.messageList # Fetch Message List from model
 
 		# FIXME Get button instances
+		# http://tkinter.unpythonic.net/wiki/CallbackConfusion
+		# http://stackoverflow.com/questions/728356/dynamically-creating-a-menu-in-tkinter-lambda-expressions
 		for i in messagesToLoad:
-			message = ''
-			r = messagesToLoad.index(i) + 1
+			rowToInsertAt = messagesToLoad.index(i) + 1
 
 			messageText = Label(self.frame)
 			messageText['text'] = i
-			messageText.grid(column=0, row=r, sticky='w', padx=10)
+			messageText.grid(column=0, row=rowToInsertAt, sticky='w', padx=10)
 
 			editButton = Button(self.frame)
-			indexVar = StringVar()
 			editButton['text'] = 'Edit'
-			editButton['command'] = lambda: self.editMessage(messagesToLoad[r-1])
-			editButton.grid(column=1, row=r, sticky='e')
+			# editButton['command'] = lambda rowToInsertAt=rowToInsertAt: self.editMessage(messagesToLoad[rowToInsertAt-1])
+			editButton['command'] = lambda i=i: self.editMessage(i)
+			editButton.grid(column=1, row=rowToInsertAt, sticky='e')
 
 			deleteButton = Button(self.frame)
 			deleteButton['text'] = 'Delete'
-			editButton['command'] = lambda: self.editMessage(r)
-			deleteButton.grid(column=2, row=r, sticky='e', padx=10)
+			deleteButton['command'] = lambda i=i: self.deleteMessage(i)
+			deleteButton.grid(column=2, row=rowToInsertAt, sticky='e', padx=10)
 			logging.debug(i)
-			logging.debug(r)
+			logging.debug(rowToInsertAt)
 
 
+	def editMessage(self, c):
+		logging.debug('Editing: ' + str(c))
+		# TODO Write Edit function
 
-	@classmethod
-	def editMessage(cls, c):
-		print(c)
+	def deleteMessage(self,c):
+		logging.debug('Deleting: ' + str(c))
+		# TODO Write Delete Function
 
 
 	def OnFrameConfigure(self, event):
@@ -79,8 +85,6 @@ class main(Frame, messageController):
 		addMessage['text'] = 'Add New Message'
 		# addMessage['command'] = main.refreshMessageList
 		addMessage.grid(column=1, row=0, sticky='n', padx=10, pady=10)
-
-
 
 class menuBar(Menu):
 	def __init__(self, parent, **kw):
