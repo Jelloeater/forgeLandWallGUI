@@ -11,8 +11,16 @@ class bootloader(messageController):
 	@classmethod
 	def startUp(cls):
 		logging.debug('Started Boot loader')
-		# TODO Load settings
+		# TODO Check if server active
+		# TODO Display error dialog if server cannot be reached
+
+		cls.loadSettings()
 		cls.refreshMessageList()
+
+	@classmethod
+	def shutDown(cls):
+		logging.debug('Shutting down')
+		cls.saveSettings()
 
 
 class mainGUI(Frame, messageController):
@@ -255,8 +263,6 @@ class mainGUI(Frame, messageController):
 if __name__ == "__main__":
 	logging.debug("Started main program")
 	bootloader.startUp()
-	# TODO Check if server active
-	# TODO Display error dialog if server cannot be reached
 
 	root = Tk()
 	root.columnconfigure(0, weight=1)
@@ -267,5 +273,6 @@ if __name__ == "__main__":
 	root.wm_iconbitmap(bitmap='images/icon.ico')
 	mainGUI(root).grid()
 	root.mainloop()
-	# TODO Save settings
+
+	bootloader.shutDown()
 	logging.debug("End Of Program")
