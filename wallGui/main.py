@@ -1,6 +1,7 @@
 from Tkinter import *
 import logging
 import tkSimpleDialog
+import tkMessageBox
 
 from controler import messageController
 
@@ -16,11 +17,11 @@ class main(Frame, messageController):
 		self.optionsMenu = Menu(self.menuBar, tearoff=0)
 		self.menuBar.add_cascade(label="Options", menu=self.optionsMenu)
 		self.optionsMenu.add_command(label="Refresh", command=self.refreshGUI, underline=1)
-		self.optionsMenu.add_command(label="Server Settings")
+		self.optionsMenu.add_command(label="Server Settings", command=self.editServerAddress, underline=1)
 		self.editMenu = Menu(self.menuBar, tearoff=0)
 		self.menuBar.add_cascade(label="Help", menu=self.editMenu)
-		self.editMenu.add_command(label="Help")
-		self.editMenu.add_command(label="About")
+		self.editMenu.add_command(label="Help", command=self.programHelp)
+		self.editMenu.add_command(label="About", command=self.aboutBox)
 		self.master.config(menu=self.menuBar)
 
 		self.refreshMessageList()
@@ -29,15 +30,15 @@ class main(Frame, messageController):
 
 		self.topFrame = Frame()
 		self.entryBox = Entry(self.topFrame)
-		self.entryBox.insert(0,'Enter New Message Here')
+		self.entryBox.insert(0, 'Enter New Message Here')
 		self.entryBox.bind('<Return>', lambda event: self.addMessage_GUI(self.entryBox.get()))
 		# Bind needs to send the event to the handler
-		self.entryBox.pack(side='left', fill='x', expand='True')
+		self.entryBox.pack(side='left', fill='x', expand='True', padx=5)
 
 		self.addMessage = Button(self.topFrame)
 		self.addMessage['text'] = 'Add New Message'
 		self.addMessage['command'] = lambda: self.addMessage_GUI(self.entryBox.get())
-		self.addMessage.pack(side='right', padx=10)
+		self.addMessage.pack(side='right', padx=0)
 		self.topFrame.pack(fill='x')
 
 		self.createMessageFrame()
@@ -72,7 +73,7 @@ class main(Frame, messageController):
 
 			messageText = Label(self.messageListFrame)
 			messageText['text'] = i['message']
-			messageText.grid(column=0, row=rowToInsertAt, sticky='w', padx=10)
+			messageText.grid(column=0, row=rowToInsertAt, sticky='w', padx=0)
 
 			timestampText = Label(self.messageListFrame)
 			timestampText['text'] = i['timestamp']
@@ -81,6 +82,7 @@ class main(Frame, messageController):
 			editButton = Button(self.messageListFrame)
 			editButton['text'] = 'Edit'
 			editButton['command'] = lambda i=i: self.editMessage_GUI(i)  # Self referencing callback function
+			# FIXME Exception: TypeError: cannot concatenate 'str' and 'NoneType' objects (when input is empty)
 			editButton.grid(column=2, row=rowToInsertAt, sticky='e')
 
 			deleteButton = Button(self.messageListFrame)
@@ -96,6 +98,7 @@ class main(Frame, messageController):
 		self.refreshGUI()
 
 	def editMessage_GUI(self, c):
+		# TODO Insert current message into text field
 		messageIn = tkSimpleDialog.askstring(title='Edit message', prompt='Enter new message')
 		# TODO Maybe replace with custom dialog box?
 		self.editMessage(indexToEdit=c['index'], newMessage=messageIn)
@@ -118,9 +121,23 @@ class main(Frame, messageController):
 		self.hsb.destroy()
 		self.createMessageFrame()
 
+	def editServerAddress(self):
+		# TODO Create GUI w/ address and port, then destroy when done
+		pass
+
 	def OnFrameConfigure(self, event):
 		"""Reset the scroll region to encompass the inner frame"""
 		self.messageListCanvas.configure(scrollregion=self.messageListCanvas.bbox("all"))
+
+	def aboutBox(self):
+		message = 'A simple GET/POST front end for a message server API. \nBy Jesse S \n' + self.versionNumber \
+				+ '\nhttp://bitbucket.org/Jelloeater/forgelandwallgui'
+		tkMessageBox.showinfo(title='About', message=message)
+
+	@staticmethod
+	def programHelp():
+		message = 'Press button \nReceive message'
+		tkMessageBox.showinfo(title='About', message=message)
 
 
 if __name__ == "__main__":

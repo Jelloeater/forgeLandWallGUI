@@ -8,4 +8,5 @@ class settings:
 	port = '9000'
 	serverAddress = 'http://'+ serverIp + ':'+ port + '/'
 	numberOfMessagesToGet = 15
-	versionNumber = "v0.5b"
+	versionNumber = "v1.0"
+	# TODO Write JSON based settings save and load
