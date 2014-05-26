@@ -26,19 +26,33 @@ class messageController(message):
 
 	@classmethod
 	def addMessageToList(cls, messageToAdd):
-		""" Adds the messages to server and refreshes list"""
-		logging.debug("Adding " + str(messageToAdd))
-		data = {'create': messageToAdd}
-		requests.post(url=cls.serverAddress+'post', data=data)
+		""" Adds the messages to server """
+		# FIXME Test for whitespace input
+		if messageToAdd != cls.defaultMessageBoxText:
+			logging.debug("Adding " + str(messageToAdd))
+			data = {'create': messageToAdd}
+			requests.post(url=cls.serverAddress + 'post', data=data)
+			return True
+		else:
+			logging.warning('User did not enter a non default message')
+			return False
 
 	@classmethod
 	def editMessage(cls, indexToEdit, newMessage):
-		logging.debug('Editing INDEX @: ' + str(indexToEdit) + ' - ' + newMessage)
-		data = {'edit': newMessage, 'index': indexToEdit}
-		requests.post(url=cls.serverAddress+'post', data=data)
+		""" Edits message via index"""
+		# FIXME Test for whitespace input
+		if newMessage != '' and newMessage is not None:
+			logging.debug('Editing INDEX @: ' + str(indexToEdit) + ' - ' + str(newMessage))
+			data = {'edit': newMessage, 'index': indexToEdit}
+			requests.post(url=cls.serverAddress + 'post', data=data)
+			return True
+		else:
+			logging.warning('User entered a blank message')
+			return False
 
 	@classmethod
 	def deleteMessage(cls, indexToDelete):
+		""" Deletes message from server """
 		logging.debug('Deleting INDEX @: ' + str(indexToDelete))
 		data = {'delete': indexToDelete}
 		requests.post(url=cls.serverAddress+'post', data=data)

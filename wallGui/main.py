@@ -20,8 +20,8 @@ class main(Frame, messageController):
 		self.optionsMenu.add_command(label="Server Settings", command=self.editServerAddress, underline=1)
 		self.editMenu = Menu(self.menuBar, tearoff=0)
 		self.menuBar.add_cascade(label="Help", menu=self.editMenu)
-		self.editMenu.add_command(label="Help", command=self.programHelp)
-		self.editMenu.add_command(label="About", command=self.aboutBox)
+		self.editMenu.add_command(label="Help", command=self.programHelp, underline=1)
+		self.editMenu.add_command(label="About", command=self.aboutBox, underline=1)
 		self.master.config(menu=self.menuBar)
 
 		self.refreshMessageList()
@@ -30,7 +30,7 @@ class main(Frame, messageController):
 
 		self.topFrame = Frame()
 		self.entryBox = Entry(self.topFrame)
-		self.entryBox.insert(0, 'Enter New Message Here')
+		self.entryBox.insert(0, self.defaultMessageBoxText)
 		self.entryBox.bind('<Return>', lambda event: self.addMessage_GUI(self.entryBox.get()))
 		# Bind needs to send the event to the handler
 		self.entryBox.pack(side='left', fill='x', expand='True', padx=5)
@@ -82,7 +82,6 @@ class main(Frame, messageController):
 			editButton = Button(self.messageListFrame)
 			editButton['text'] = 'Edit'
 			editButton['command'] = lambda i=i: self.editMessage_GUI(i)  # Self referencing callback function
-			# FIXME Exception: TypeError: cannot concatenate 'str' and 'NoneType' objects (when input is empty)
 			editButton.grid(column=2, row=rowToInsertAt, sticky='e')
 
 			deleteButton = Button(self.messageListFrame)
@@ -93,15 +92,18 @@ class main(Frame, messageController):
 		# logging.debug(rowToInsertAt)
 
 	def addMessage_GUI(self, messageToAdd):
-		self.addMessageToList(messageToAdd)
+		status = self.addMessageToList(messageToAdd)
+		if not status:
+			tkMessageBox.showerror('Error','Message invalid')
 		self.entryBox.select_range(0, END)  # Selects the contents so the user can just type the next message
 		self.refreshGUI()
 
 	def editMessage_GUI(self, c):
-		# TODO Insert current message into text field
 		messageIn = tkSimpleDialog.askstring(title='Edit message', prompt='Enter new message')
 		# TODO Maybe replace with custom dialog box?
-		self.editMessage(indexToEdit=c['index'], newMessage=messageIn)
+		status = self.editMessage(indexToEdit=c['index'], newMessage=messageIn)
+		if not status:
+			tkMessageBox.showerror('Error', 'Blank message')
 		self.refreshGUI()
 
 	def deleteMessage_GUI(self, c):

@@ -9,4 +9,5 @@ class settings:
 	serverAddress = 'http://'+ serverIp + ':'+ port + '/'
 	numberOfMessagesToGet = 15
 	versionNumber = "v1.0"
+	defaultMessageBoxText = 'Enter New Message Here'
 	# TODO Write JSON based settings save and load
