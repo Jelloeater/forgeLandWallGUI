@@ -1,5 +1,7 @@
 from Tkinter import *
 import logging
+import tkSimpleDialog
+
 from controler import messageController
 
 
@@ -8,34 +10,39 @@ class main(Frame, messageController):
 		Frame.__init__(self, root)
 
 		self.menuBar = Menu()
-		fileMenu = Menu(self.menuBar, tearoff=0)
-		self.menuBar.add_cascade(label="File", menu=fileMenu, underline=1)
-		fileMenu.add_command(label="Quit", command=root.destroy, underline=1)
-		optionsMenu = Menu(self.menuBar, tearoff=0)
-		self.menuBar.add_cascade(label="Options", menu=optionsMenu)
-		optionsMenu.add_command(label="Refresh", command=self.refreshWindow, underline=1)
-		optionsMenu.add_command(label="Server Settings")
-		editMenu = Menu(self.menuBar, tearoff=0)
-		self.menuBar.add_cascade(label="Help", menu=editMenu)
-		editMenu.add_command(label="Help")
-		editMenu.add_command(label="About")
+		self.fileMenu = Menu(self.menuBar, tearoff=0)
+		self.menuBar.add_cascade(label="File", menu=self.fileMenu, underline=1)
+		self.fileMenu.add_command(label="Quit", command=root.destroy, underline=1)
+		self.optionsMenu = Menu(self.menuBar, tearoff=0)
+		self.menuBar.add_cascade(label="Options", menu=self.optionsMenu)
+		self.optionsMenu.add_command(label="Refresh", command=self.refreshGUI, underline=1)
+		self.optionsMenu.add_command(label="Server Settings")
+		self.editMenu = Menu(self.menuBar, tearoff=0)
+		self.menuBar.add_cascade(label="Help", menu=self.editMenu)
+		self.editMenu.add_command(label="Help")
+		self.editMenu.add_command(label="About")
 		self.master.config(menu=self.menuBar)
 
 		self.refreshMessageList()
 
-		self.topFrame = Frame()
-		entryBox = Entry(self.topFrame)
-		entryBox.pack(side='left', fill='x', expand='True')
+		# TODO Add search function
 
-		addMessage = Button(self.topFrame)
-		addMessage['text'] = 'Add New Message'
-		# addMessage['command'] = main.refreshMessageList
-		addMessage.pack(side='right', padx=10)
+		self.topFrame = Frame()
+		self.entryBox = Entry(self.topFrame)
+		self.entryBox.insert(0,'Enter New Message Here')
+		self.entryBox.bind('<Return>', lambda event: self.addMessage_GUI(self.entryBox.get()))
+		# Bind needs to send the event to the handler
+		self.entryBox.pack(side='left', fill='x', expand='True')
+
+		self.addMessage = Button(self.topFrame)
+		self.addMessage['text'] = 'Add New Message'
+		self.addMessage['command'] = lambda: self.addMessage_GUI(self.entryBox.get())
+		self.addMessage.pack(side='right', padx=10)
 		self.topFrame.pack(fill='x')
 
 		self.createMessageFrame()
 
-
+	# noinspection PyAttributeOutsideInit
 	def createMessageFrame(self):
 		# Sets up frame
 		self.messageListCanvas = Canvas(root, borderwidth=0)
@@ -73,39 +80,48 @@ class main(Frame, messageController):
 
 			editButton = Button(self.messageListFrame)
 			editButton['text'] = 'Edit'
-			editButton['command'] = lambda i=i: self.editMessage(i)
+			editButton['command'] = lambda i=i: self.editMessage_GUI(i)  # Self referencing callback function
 			editButton.grid(column=2, row=rowToInsertAt, sticky='e')
 
 			deleteButton = Button(self.messageListFrame)
 			deleteButton['text'] = 'Delete'
-			deleteButton['command'] = lambda i=i: self.deleteMessage(i)
+			deleteButton['command'] = lambda i=i: self.deleteMessage_GUI(i)
 			deleteButton.grid(column=3, row=rowToInsertAt, sticky='e', padx=10)
 		# logging.debug(i)
 		# logging.debug(rowToInsertAt)
 
+	def addMessage_GUI(self, messageToAdd):
+		self.addMessageToList(messageToAdd)
+		self.entryBox.select_range(0, END)  # Selects the contents so the user can just type the next message
+		self.refreshGUI()
 
-	def editMessage(self, c):
-		logging.debug('Editing: ' + str(c))
+	def editMessage_GUI(self, c):
+		messageIn = tkSimpleDialog.askstring(title='Edit message', prompt='Enter new message')
+		# TODO Maybe replace with custom dialog box?
+		self.editMessage(indexToEdit=c['index'], newMessage=messageIn)
+		self.refreshGUI()
 
-		# TODO Write Edit function
+	def deleteMessage_GUI(self, c):
+		self.deleteMessage(indexToDelete=c['index'])
+		self.refreshGUI()
 
-	def deleteMessage(self, c):
-		logging.debug('Deleting: ' + str(c))
+	def refreshGUI(self):
+		""" Refreshes the message list AND GUI window"""
+		logging.debug('Refreshing Message Window')
+		self.refreshMessageList()
+		self.refresh_GUI_Window()
 
-		# TODO Write Delete Function
+	def refresh_GUI_Window(self):
+		""" Refreshes just the GUI window"""
+		self.messageListCanvas.destroy()
+		self.vsb.destroy()
+		self.hsb.destroy()
+		self.createMessageFrame()
 
 	def OnFrameConfigure(self, event):
 		"""Reset the scroll region to encompass the inner frame"""
 		self.messageListCanvas.configure(scrollregion=self.messageListCanvas.bbox("all"))
 
-
-	def refreshWindow(self):
-		logging.debug('Refreshing Message Window')
-		self.refreshMessageList()
-		self.messageListCanvas.destroy()
-		self.vsb.destroy()
-		self.hsb.destroy()
-		self.createMessageFrame()
 
 if __name__ == "__main__":
 	logging.debug("Started main program")
