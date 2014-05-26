@@ -1,6 +1,5 @@
 from Tkinter import *
 import logging
-import tkSimpleDialog
 import tkMessageBox
 
 from controler import messageController
@@ -14,14 +13,22 @@ class main(Frame, messageController):
 		self.fileMenu = Menu(self.menuBar, tearoff=0)
 		self.menuBar.add_cascade(label="File", menu=self.fileMenu, underline=1)
 		self.fileMenu.add_command(label="Quit", command=root.destroy, underline=1)
+
+		self.editMenu = Menu(self.menuBar, tearoff=0)
+		self.menuBar.add_cascade(label="Edit", menu=self.editMenu)
+		self.editMenu.add_command(label="Cut", underline=1)
+		self.editMenu.add_command(label="Copy", underline=1)
+		self.editMenu.add_command(label="Paste", underline=1)
+		# FIXME add working copy paste
+
 		self.optionsMenu = Menu(self.menuBar, tearoff=0)
 		self.menuBar.add_cascade(label="Options", menu=self.optionsMenu)
 		self.optionsMenu.add_command(label="Refresh", command=self.refreshGUI, underline=1)
-		self.optionsMenu.add_command(label="Server Settings", command=self.editServerAddress, underline=1)
-		self.editMenu = Menu(self.menuBar, tearoff=0)
-		self.menuBar.add_cascade(label="Help", menu=self.editMenu)
-		self.editMenu.add_command(label="Help", command=self.programHelp, underline=1)
-		self.editMenu.add_command(label="About", command=self.aboutBox, underline=1)
+		self.optionsMenu.add_command(label="Settings", command=self.editSettings, underline=1)
+		self.helpMenu = Menu(self.menuBar, tearoff=0)
+		self.menuBar.add_cascade(label="Help", menu=self.helpMenu)
+		self.helpMenu.add_command(label="Help", command=self.programHelp, underline=1)
+		self.helpMenu.add_command(label="About", command=self.aboutBox, underline=1)
 		self.master.config(menu=self.menuBar)
 
 		self.refreshMessageList()
@@ -111,13 +118,47 @@ class main(Frame, messageController):
 		self.entryBox.select_range(0, END)  # Selects the contents so the user can just type the next message
 		self.refreshGUI()
 
-	def editMessage_GUI(self, c):
-		messageIn = tkSimpleDialog.askstring(title='Edit message', prompt='Enter new message')
-		# TODO Maybe replace with custom dialog box?
-		status = self.editMessage(indexToEdit=c['index'], newMessage=messageIn)
-		if not status:
-			tkMessageBox.showerror('Error', 'Blank message')
-		self.refreshGUI()
+	def editMessage_GUI(self, messageRecordIn):
+
+		def editMessage_GUI_Ok_Command(messageInDialogIn):
+			if messageRecordIn['message'] != textBox.get():
+				status = self.editMessage(indexToEdit=messageRecordIn['index'], newMessage=textBox.get())
+				if not status:
+					tkMessageBox.showerror('Error', 'Blank message')
+				self.refreshGUI()
+			else:
+				tkMessageBox.showerror(message='Enter a new message')
+			messageInDialogIn.destroy()
+
+		messageInDialog = Tk()
+		messageInDialog.title('Edit Message')
+		messageInDialog.wm_iconbitmap(bitmap='images/icon.ico')
+		messageInDialog.columnconfigure(0, weight=1)
+		messageInDialog.rowconfigure(0, weight=1)
+
+		messageInDialog.minsize(width=100, height=50)
+		frame = Frame(messageInDialog)
+
+		label = Label(frame)
+		label['text'] = 'Enter New Message'
+		label.pack()
+
+		textBox = Entry(frame)
+		textBox.insert(0, messageRecordIn['message'])
+		textBox.pack(fill='both')
+
+		submitButton = Button(frame)
+		submitButton['text'] = 'Ok'
+		submitButton['command'] = lambda: editMessage_GUI_Ok_Command(messageInDialog)
+		submitButton.pack(side="left", expand="yes", fill="both", padx=5, pady=3)
+
+		cancelButton = Button(frame)
+		cancelButton['text'] = 'Cancel'
+		cancelButton['command'] = messageInDialog.destroy
+		cancelButton.pack(fill='both', expand="yes", padx=5, pady=3)
+
+		frame.pack(fill='both', expand="yes", padx=0, pady=0)
+
 
 	def deleteMessage_GUI(self, c):
 		self.deleteMessage(indexToDelete=c['index'])
@@ -141,9 +182,53 @@ class main(Frame, messageController):
 		self.hsb.destroy()
 		self.createMessageFrame()
 
-	def editServerAddress(self):
+	def editSettings(self):
 		# TODO Create GUI w/ address and port, then destroy when done
-		pass
+
+		def commitSettings(messageInDialog):
+			# TODO Get entry and write settings
+			messageInDialog.destroy()
+
+		messageInDialog = Tk()
+		messageInDialog.title('Settings')
+		messageInDialog.wm_iconbitmap(bitmap='images/icon.ico')
+		messageInDialog.columnconfigure(0, weight=1)
+		messageInDialog.rowconfigure(0, weight=1)
+
+		messageInDialog.minsize(width=100, height=50)
+		frame = Frame(messageInDialog)
+
+		label = Label(frame)
+		label['text'] = 'Server Address'
+		label.pack()
+
+		IPAddressBox = Entry(frame)
+		IPAddressBox.insert(0, self.serverIp)
+		IPAddressBox.pack(fill='both')
+
+		portLabel = Label(frame)
+		portLabel['text'] = 'Server Port'
+		portLabel.pack()
+
+
+		portBox = Entry(frame)
+		portBox.insert(0, self.port)
+		portBox.pack(fill='both')
+
+		label['text'] = 'Server Port'
+		label.pack()
+
+		submitButton = Button(frame)
+		submitButton['text'] = 'Ok'
+		submitButton['command'] = lambda: commitSettings(messageInDialog)
+		submitButton.pack(side="left", expand="yes", fill="both", padx=5, pady=3)
+
+		cancelButton = Button(frame)
+		cancelButton['text'] = 'Cancel'
+		cancelButton['command'] = messageInDialog.destroy
+		cancelButton.pack(fill='both', expand="yes", padx=5, pady=3)
+
+		frame.pack(fill='both', expand="yes", padx=0, pady=0)
 
 	def OnFrameConfigure(self, event):
 		"""Reset the scroll region to encompass the inner frame"""
