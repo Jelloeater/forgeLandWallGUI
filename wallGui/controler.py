@@ -54,3 +54,19 @@ class messageController(message):
 		logging.debug('Deleting INDEX @: ' + str(indexToDelete))
 		data = {'delete': indexToDelete}
 		requests.post(url=cls.serverAddress+'post', data=data)
+
+	@classmethod
+	def searchMessage(cls, messageToSearchFor):
+		""" Search for message and return query """
+		if messageToSearchFor != '' and messageToSearchFor is not None and not str(messageToSearchFor).isspace():
+			logging.debug('Searching for: ' + messageToSearchFor)
+
+			rawJSON = Requests.get(settings.serverAddress + 'query/' + str(messageToSearchFor))
+			messageList = json.loads(rawJSON.content)
+			logging.debug("Got " + str(len(messageList)) + " message(s)")
+			message.messageList = messageList
+			return messageList  # For testing and other neat things
+		else:
+			cls.refreshMessageList()
+			logging.warning('User entered a blank search')
+			return False

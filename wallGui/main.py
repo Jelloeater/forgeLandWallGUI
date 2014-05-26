@@ -26,7 +26,6 @@ class main(Frame, messageController):
 
 		self.refreshMessageList()
 
-		# TODO Add search function
 
 		self.topFrame = Frame()
 		self.entryBox = Entry(self.topFrame)
@@ -38,12 +37,24 @@ class main(Frame, messageController):
 		self.addMessage = Button(self.topFrame)
 		self.addMessage['text'] = 'Add New Message'
 		self.addMessage['command'] = lambda: self.addMessage_GUI(self.entryBox.get())
-		self.addMessage.pack(side='right', padx=0)
+		self.addMessage.pack(side='left', padx=0)
+
+		self.searchButton = Button(self.topFrame)
+		self.searchButton['text'] = 'Search'
+		self.searchButton['command'] = lambda: self.searchMessage_GUI(self.entryBox.get())
+		self.searchButton.pack(side='right', padx=0)
+
 		self.topFrame.pack(fill='x')
 
 		self.createMessageFrame()
 
 		# TODO Add status bar
+
+		# self.statusBar = Frame()
+		# self.status = Label(self.statusBar)
+		# self.status['text'] = "Ok"
+		# self.status.pack(side='bottom', padx=5)
+		# self.statusBar.pack(side='bottom', fill='x', expand='True', padx=5)
 
 	# noinspection PyAttributeOutsideInit
 	def createMessageFrame(self):
@@ -112,6 +123,11 @@ class main(Frame, messageController):
 		self.deleteMessage(indexToDelete=c['index'])
 		self.refreshGUI()
 
+	def searchMessage_GUI(self, messageToSearchFor):
+		logging.debug('Refreshing Message Window - Search')
+		self.searchMessage(messageToSearchFor)
+		self.refresh_GUI_Window()
+
 	def refreshGUI(self):
 		""" Refreshes the message list AND GUI window"""
 		logging.debug('Refreshing Message Window')
@@ -146,6 +162,7 @@ class main(Frame, messageController):
 
 if __name__ == "__main__":
 	logging.debug("Started main program")
+	# TODO Load settings
 	root = Tk()
 	root.columnconfigure(0, weight=1)
 	# root.rowconfigure(0, weight=1)
@@ -155,4 +172,5 @@ if __name__ == "__main__":
 	root.wm_iconbitmap(bitmap='images/icon.ico')
 	main(root).grid()
 	root.mainloop()
+	# TODO Save settings
 	logging.debug("End Of Program")
