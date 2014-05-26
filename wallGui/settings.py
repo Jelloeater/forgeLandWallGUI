@@ -6,8 +6,8 @@ logging.basicConfig(format="[%(asctime)s] [%(levelname)8s] --- %(message)s (%(fi
 class settings:
 	serverIp = '192.168.1.165'
 	port = '9000'
-	serverAddress = 'http://'+ serverIp + ':'+ port + '/'
+	serverAddress = 'http://' + serverIp + ':' + port + '/'
 	numberOfMessagesToGet = 0
-	versionNumber = "v1.0"
+	versionNumber = "v1.2"
 	defaultMessageBoxText = 'Enter Message / Search'
 	# TODO Write JSON based settings save and load

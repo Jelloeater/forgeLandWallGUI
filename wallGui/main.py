@@ -163,6 +163,10 @@ class main(Frame, messageController):
 if __name__ == "__main__":
 	logging.debug("Started main program")
 	# TODO Load settings
+
+	# TODO Check if server active
+	# TODO Display error dialog if server cannot be reached
+
 	root = Tk()
 	root.columnconfigure(0, weight=1)
 	# root.rowconfigure(0, weight=1)
