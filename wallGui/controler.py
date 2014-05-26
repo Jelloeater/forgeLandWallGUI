@@ -27,8 +27,7 @@ class messageController(message):
 	@classmethod
 	def addMessageToList(cls, messageToAdd):
 		""" Adds the messages to server """
-		# FIXME Test for whitespace input
-		if messageToAdd != cls.defaultMessageBoxText:
+		if messageToAdd != cls.defaultMessageBoxText and not str(messageToAdd).isspace():
 			logging.debug("Adding " + str(messageToAdd))
 			data = {'create': messageToAdd}
 			requests.post(url=cls.serverAddress + 'post', data=data)
@@ -40,8 +39,7 @@ class messageController(message):
 	@classmethod
 	def editMessage(cls, indexToEdit, newMessage):
 		""" Edits message via index"""
-		# FIXME Test for whitespace input
-		if newMessage != '' and newMessage is not None:
+		if newMessage != '' and newMessage is not None and not str(newMessage).isspace():
 			logging.debug('Editing INDEX @: ' + str(indexToEdit) + ' - ' + str(newMessage))
 			data = {'edit': newMessage, 'index': indexToEdit}
 			requests.post(url=cls.serverAddress + 'post', data=data)

@@ -43,6 +43,8 @@ class main(Frame, messageController):
 
 		self.createMessageFrame()
 
+		# TODO Add status bar
+
 	# noinspection PyAttributeOutsideInit
 	def createMessageFrame(self):
 		# Sets up frame
@@ -147,7 +149,8 @@ if __name__ == "__main__":
 	root = Tk()
 	root.columnconfigure(0, weight=1)
 	# root.rowconfigure(0, weight=1)
-	root.minsize(width=250, height=50)
+	root.geometry("300x250")
+	root.minsize(width=300, height=200)
 	root.title('Forge Land Message Editor ' + main.versionNumber)
 	root.wm_iconbitmap(bitmap='images/icon.ico')
 	main(root).grid()
