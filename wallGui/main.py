@@ -1,11 +1,21 @@
 from Tkinter import *
 import logging
 import tkMessageBox
-
 from controler import messageController
 
 
-class main(Frame, messageController):
+class bootloader(messageController):
+	def __init__(self):
+		pass
+
+	@classmethod
+	def startUp(cls):
+		logging.debug('Started Boot loader')
+		# TODO Load settings
+		cls.refreshMessageList()
+
+
+class mainGUI(Frame, messageController):
 	def __init__(self, rootWindow):
 		Frame.__init__(self, root)
 
@@ -30,8 +40,6 @@ class main(Frame, messageController):
 		self.helpMenu.add_command(label="Help", command=self.programHelp, underline=1)
 		self.helpMenu.add_command(label="About", command=self.aboutBox, underline=1)
 		self.master.config(menu=self.menuBar)
-
-		self.refreshMessageList()
 
 
 		self.topFrame = Frame()
@@ -183,11 +191,10 @@ class main(Frame, messageController):
 		self.createMessageFrame()
 
 	def editSettings(self):
-		# TODO Create GUI w/ address and port, then destroy when done
 
-		def commitSettings(messageInDialog):
+		def commitSettings(messageInDialogIn):
 			# TODO Get entry and write settings
-			messageInDialog.destroy()
+			messageInDialogIn.destroy()
 
 		messageInDialog = Tk()
 		messageInDialog.title('Settings')
@@ -247,8 +254,7 @@ class main(Frame, messageController):
 
 if __name__ == "__main__":
 	logging.debug("Started main program")
-	# TODO Load settings
-
+	bootloader.startUp()
 	# TODO Check if server active
 	# TODO Display error dialog if server cannot be reached
 
@@ -257,9 +263,9 @@ if __name__ == "__main__":
 	# root.rowconfigure(0, weight=1)
 	root.geometry("300x250")
 	root.minsize(width=300, height=200)
-	root.title('Forge Land Message Editor ' + main.versionNumber)
+	root.title('Forge Land Message Editor ' + mainGUI.versionNumber)
 	root.wm_iconbitmap(bitmap='images/icon.ico')
-	main(root).grid()
+	mainGUI(root).grid()
 	root.mainloop()
 	# TODO Save settings
 	logging.debug("End Of Program")
