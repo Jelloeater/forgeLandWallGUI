@@ -18,15 +18,33 @@ class bootloader(messageController):
 		if cls.isServerActive():
 			cls.loadSettings()
 			cls.refreshMessageList()
+			return True
 		else:
 			top = Tk()
 			top.withdraw()
 			tkMessageBox.showerror(message='Cannot Reach Server @ ' + 'http://' + cls.serverIp + ':' + cls.port + '/'
 			                               + '\nPlease edit server address')
-			# cls.editSettings()
+
+			settingsBox = cls.editSettings()
+			# settingsBox.mainloop()
+			# settingsBox.destroy()
+
 			# FIXME Handle inactive server
 			top.destroy()
+			return False
 
+
+	@classmethod
+	def runMain(cls):
+		cls.root = Tk()
+		cls.root.columnconfigure(0, weight=1)
+		# root.rowconfigure(0, weight=1)
+		cls.root.geometry("300x250")
+		cls.root.minsize(width=300, height=200)
+		cls.root.title('Forge Land Message Editor ' + mainGUI.versionNumber)
+		cls.root.wm_iconbitmap(bitmap='images/icon.ico')
+		mainGUI(cls.root).grid()
+		cls.root.mainloop()
 
 	@classmethod
 	def shutDown(cls):
@@ -34,14 +52,14 @@ class bootloader(messageController):
 		cls.saveSettings()
 
 
-class mainGUI(Frame, messageController):
+class mainGUI(Frame, messageController, bootloader):
 	def __init__(self, rootWindow):
-		Frame.__init__(self, root)
+		Frame.__init__(self, self.root)
 
 		self.menuBar = Menu()
 		self.fileMenu = Menu(self.menuBar, tearoff=0)
 		self.menuBar.add_cascade(label="File", menu=self.fileMenu, underline=1)
-		self.fileMenu.add_command(label="Quit", command=root.destroy, underline=1)
+		self.fileMenu.add_command(label="Quit", command=self.root.destroy, underline=1)
 
 		self.editMenu = Menu(self.menuBar, tearoff=0)
 		self.menuBar.add_cascade(label="Edit", menu=self.editMenu)
@@ -93,15 +111,15 @@ class mainGUI(Frame, messageController):
 	# noinspection PyAttributeOutsideInit
 	def createMessageFrame(self):
 		# Sets up frame
-		self.messageListCanvas = Canvas(root, borderwidth=0)
+		self.messageListCanvas = Canvas(self.root, borderwidth=0)
 		self.messageListFrame = Frame(self.messageListCanvas)
 
 		# Creates scroll bar
-		self.vsb = Scrollbar(root, orient="vertical", command=self.messageListCanvas.yview)
+		self.vsb = Scrollbar(self.root, orient="vertical", command=self.messageListCanvas.yview)
 		self.messageListCanvas.configure(yscrollcommand=self.vsb.set)
 		self.vsb.pack(side="right", fill="y")
 
-		self.hsb = Scrollbar(root, orient="horizontal", command=self.messageListCanvas.xview)
+		self.hsb = Scrollbar(self.root, orient="horizontal", command=self.messageListCanvas.xview)
 		self.messageListCanvas.configure(xscrollcommand=self.hsb.set)
 		self.hsb.pack(side="bottom", fill="x")
 
@@ -226,18 +244,12 @@ class mainGUI(Frame, messageController):
 
 if __name__ == "__main__":
 	logging.debug("Started main program")
-	bootloader.startUp()
+
+	status = bootloader.startUp()
 
 	# TODO Should we have this disabled on bad startup?
-	root = Tk()
-	root.columnconfigure(0, weight=1)
-	# root.rowconfigure(0, weight=1)
-	root.geometry("300x250")
-	root.minsize(width=300, height=200)
-	root.title('Forge Land Message Editor ' + mainGUI.versionNumber)
-	root.wm_iconbitmap(bitmap='images/icon.ico')
-	mainGUI(root).grid()
-	root.mainloop()
+	if status:
+		bootloader.runMain()
 
 	bootloader.shutDown()
 	logging.debug("End Of Program")

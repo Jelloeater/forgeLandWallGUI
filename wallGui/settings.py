@@ -12,7 +12,7 @@ settingsFilePath = "/settings.json"
 
 
 class settings:
-	serverIp = '192.168.1.160'
+	serverIp = '192.168.1.165'
 	port = '9000'
 	numberOfMessagesToGet = 0
 	versionNumber = "v1.5"
@@ -105,3 +105,5 @@ class settings:
 		cancelButton.pack(fill='both', expand="yes", padx=5, pady=3)
 
 		frame.pack(fill='both', expand="yes", padx=0, pady=0)
+
+		return settingsDialog
