@@ -18,14 +18,19 @@ class settings:
 	versionNumber = "v1.5"
 	defaultMessageBoxText = 'Enter Message / Search'
 
-	@staticmethod
-	def isServerActive():
+	@classmethod
+	def getServerAddress(cls):
+		return 'http://' + settings.serverIp + ':' + settings.port + '/'
+
+
+	@classmethod
+	def isServerActive(cls):
 		logging.debug('Checking server')
 		try:
 			urlopen('http://' + settings.serverIp + ':' + settings.port + '/', timeout=1)
 			return True
 		except URLError:
-			logging.warning('Cannot Reach Server @ ' + 'http://' + settings.serverIp + ':' + settings.port + '/')
+			logging.warning('Cannot Reach Server @ ' + cls.getServerAddress())
 			return False
 
 	@classmethod
@@ -57,7 +62,7 @@ class settings:
 				settings.serverIp = ip
 				settings.port = p
 				tkMessageBox.showerror(message='Invalid Server Address ' + 'http://' + IPAddressBox.get() + ':' + portBox.get() + '/')
-				logging.warning('Invalid Server Address ' + 'http://' + cls.serverIp + ':' + cls.port + '/')
+				logging.warning('Invalid Server Address ' + 'http://' + IPAddressBox.get() + ':' + portBox.get() + '/')
 			messageInDialogIn.destroy()
 
 		messageInDialog = Tk()
