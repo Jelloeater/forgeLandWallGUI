@@ -13,14 +13,18 @@ class bootloader(messageController):
 	@classmethod
 	def startUp(cls):
 		logging.debug('Started Boot loader')
-		# TODO Check if server active
 		# TODO Display error dialog if server cannot be reached
 
 		if cls.isServerActive():
 			cls.loadSettings()
 			cls.refreshMessageList()
+			return True
 		else:
-			pass
+			top = Tk()
+			top.withdraw()
+			tkMessageBox.showerror(message='Cannot Reach Server @ ' + 'http://' + cls.serverIp + ':' + cls.port + '/')
+
+			cls.editSettings(startup=True)
 			# TODO Handle inactive server
 
 
@@ -225,17 +229,18 @@ class mainGUI(Frame, messageController):
 
 if __name__ == "__main__":
 	logging.debug("Started main program")
-	bootloader.startUp()
+	bootStatus = bootloader.startUp()
 
-	root = Tk()
-	root.columnconfigure(0, weight=1)
-	# root.rowconfigure(0, weight=1)
-	root.geometry("300x250")
-	root.minsize(width=300, height=200)
-	root.title('Forge Land Message Editor ' + mainGUI.versionNumber)
-	root.wm_iconbitmap(bitmap='images/icon.ico')
-	mainGUI(root).grid()
-	root.mainloop()
+	if bootStatus:
+		root = Tk()
+		root.columnconfigure(0, weight=1)
+		# root.rowconfigure(0, weight=1)
+		root.geometry("300x250")
+		root.minsize(width=300, height=200)
+		root.title('Forge Land Message Editor ' + mainGUI.versionNumber)
+		root.wm_iconbitmap(bitmap='images/icon.ico')
+		mainGUI(root).grid()
+		root.mainloop()
 
 	bootloader.shutDown()
 	logging.debug("End Of Program")

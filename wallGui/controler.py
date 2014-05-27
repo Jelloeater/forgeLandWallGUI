@@ -16,10 +16,10 @@ class messageController(message):
 	def refreshMessageList(cls):
 		""" Gets the messages from the server and loads them into the model """
 
-		if cls.isServerActive():
+		if settings.isServerActive():
 			numberToGet = cls.numberOfMessagesToGet
-			logging.info("Getting " + str(numberToGet) + ' messages from ' + cls.serverAddress)
-			rawJSON = Requests.get(settings.serverAddress + 'get/' + str(numberToGet))
+			logging.info("Getting " + str(numberToGet) + ' messages from ' + 'http://' + cls.serverIp + ':' + cls.port + '/')
+			rawJSON = Requests.get('http://' + cls.serverIp + ':' + cls.port + '/' + 'get/' + str(numberToGet))
 			messageList = json.loads(rawJSON.content)
 
 			logging.debug("Got " + str(len(messageList)) + " message(s)")
@@ -29,18 +29,12 @@ class messageController(message):
 			return False
 
 	@classmethod
-	def isServerActive(cls):
-		logging.debug('Checking server')
-		return True
-	# TODO write server ping code
-
-	@classmethod
 	def addMessageToList(cls, messageToAdd):
 		""" Adds the messages to server """
 		if messageToAdd != cls.defaultMessageBoxText and not str(messageToAdd).isspace():
 			logging.debug("Adding " + str(messageToAdd))
 			data = {'create': messageToAdd}
-			requests.post(url=cls.serverAddress + 'post', data=data)
+			requests.post(url='http://' + cls.serverIp + ':' + cls.port + '/' + 'post', data=data)
 			return True
 		else:
 			logging.warning('User did not enter a non default message')
@@ -52,7 +46,7 @@ class messageController(message):
 		if newMessage != '' and newMessage is not None and not str(newMessage).isspace():
 			logging.debug('Editing INDEX @: ' + str(indexToEdit) + ' - ' + str(newMessage))
 			data = {'edit': newMessage, 'index': indexToEdit}
-			requests.post(url=cls.serverAddress + 'post', data=data)
+			requests.post(url='http://' + cls.serverIp + ':' + cls.port + '/' + 'post', data=data)
 			return True
 		else:
 			logging.warning('User entered a blank message')
@@ -63,7 +57,7 @@ class messageController(message):
 		""" Deletes message from server """
 		logging.debug('Deleting INDEX @: ' + str(indexToDelete))
 		data = {'delete': indexToDelete}
-		requests.post(url=cls.serverAddress+'post', data=data)
+		requests.post(url='http://' + cls.serverIp + ':' + cls.port + '/' + 'post', data=data)
 
 	@classmethod
 	def searchMessage(cls, messageToSearchFor):
@@ -71,7 +65,7 @@ class messageController(message):
 		if messageToSearchFor != '' and messageToSearchFor is not None and not str(messageToSearchFor).isspace():
 			logging.debug('Searching for: ' + messageToSearchFor)
 
-			rawJSON = Requests.get(settings.serverAddress + 'query/' + str(messageToSearchFor))
+			rawJSON = Requests.get('http://' + cls.serverIp + ':' + cls.port + '/' + 'query/' + str(messageToSearchFor))
 			messageList = json.loads(rawJSON.content)
 			logging.debug("Got " + str(len(messageList)) + " message(s)")
 			message.messageList = messageList

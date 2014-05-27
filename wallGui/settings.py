@@ -1,21 +1,31 @@
 from Tkinter import Tk, Frame, Label, Entry, Button
+from urllib2 import urlopen, URLError
+# import json
+import os
 
 __author__ = 'Jesse'
 import logging
 logging.basicConfig(format="[%(asctime)s] [%(levelname)8s] --- %(message)s (%(filename)s:%(lineno)s)", level=logging.DEBUG)
 
-import json
-import os
-
 settingsFilePath = "/settings.json"
 
+
 class settings:
-	serverIp = '192.168.1.165'
+	serverIp = '192.168.1.160'
 	port = '9000'
-	serverAddress = 'http://' + serverIp + ':' + port + '/'
 	numberOfMessagesToGet = 0
-	versionNumber = "v1.2"
+	versionNumber = "v1.5"
 	defaultMessageBoxText = 'Enter Message / Search'
+
+	@staticmethod
+	def isServerActive():
+		logging.debug('Checking server')
+		try:
+			urlopen('http://' + settings.serverIp + ':' + settings.port + '/', timeout=1)
+			return True
+		except URLError:
+			logging.warning('Cannot Reach Server @ ' + 'http://' + settings.serverIp + ':' + settings.port + '/')
+			return False
 
 	@classmethod
 	def loadSettings(cls):
@@ -30,12 +40,28 @@ class settings:
 		logging.info("Settings saved")
 		# TODO Write JSON based settings save
 
-
-	def editSettings(cls):
+	@classmethod
+	def editSettings(cls, startup=False):
 
 		def commitSettings(messageInDialogIn):
-			# TODO Get entry and write settings
-			messageInDialogIn.destroy()
+			# Temp vars
+			ip = settings.serverIp
+			p = settings.port
+
+			settings.serverIp = IPAddressBox.get()
+			settings.port = portBox.get()
+			logging.critical(IPAddressBox.get())
+
+			logging.critical('NewIP' + settings.serverIp)
+			logging.critical('New Address' + 'http://' + settings.serverIp + ':' + settings.port + '/')
+
+			if not cls.isServerActive():
+				settings.serverIp = ip
+				settings.port = p
+				logging.warning('Invalid Server Address ' + 'http://' + cls.serverIp + ':' + cls.port + '/')
+			else:
+				messageInDialogIn.destroy()
+
 
 		messageInDialog = Tk()
 		messageInDialog.title('Settings')
@@ -77,3 +103,5 @@ class settings:
 		cancelButton.pack(fill='both', expand="yes", padx=5, pady=3)
 
 		frame.pack(fill='both', expand="yes", padx=0, pady=0)
+
+		if startup:messageInDialog.mainloop()
