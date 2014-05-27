@@ -13,26 +13,19 @@ class bootloader(messageController):
 	@classmethod
 	def startUp(cls):
 		logging.debug('Started Boot loader')
-		# TODO Display error dialog if server cannot be reached
 
-		if cls.isServerActive():
+		while not cls.isServerActive():
+				top = Tk()
+				top.withdraw()
+				tkMessageBox.showerror(message='Cannot Reach Server @ ' + 'http://' + cls.serverIp + ':' + cls.port + '/'
+				                               + '\nPlease edit server address')
+				top.destroy()
+
+				settingsBox = cls.editSettings()
+				settingsBox.mainloop()
+		else:
 			cls.loadSettings()
 			cls.refreshMessageList()
-			return True
-		else:
-			top = Tk()
-			top.withdraw()
-			tkMessageBox.showerror(message='Cannot Reach Server @ ' + 'http://' + cls.serverIp + ':' + cls.port + '/'
-			                               + '\nPlease edit server address')
-
-			settingsBox = cls.editSettings()
-			# settingsBox.mainloop()
-			# settingsBox.destroy()
-
-			# FIXME Handle inactive server
-			top.destroy()
-			return False
-
 
 	@classmethod
 	def runMain(cls):
@@ -245,11 +238,9 @@ class mainGUI(Frame, messageController, bootloader):
 if __name__ == "__main__":
 	logging.debug("Started main program")
 
-	status = bootloader.startUp()
+	bootloader.startUp()
 
-	# TODO Should we have this disabled on bad startup?
-	if status:
-		bootloader.runMain()
+	bootloader.runMain()
 
 	bootloader.shutDown()
 	logging.debug("End Of Program")

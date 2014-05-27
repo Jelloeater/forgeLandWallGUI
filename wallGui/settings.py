@@ -12,7 +12,7 @@ settingsFilePath = "/settings.json"
 
 
 class settings:
-	serverIp = '192.168.1.165'
+	serverIp = '192.168.1.160'
 	port = '9000'
 	numberOfMessagesToGet = 0
 	versionNumber = "v1.5"
