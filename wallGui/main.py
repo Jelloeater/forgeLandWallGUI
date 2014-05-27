@@ -22,7 +22,9 @@ class bootloader(messageController):
 				top.destroy()
 
 				settingsBox = cls.editSettings()
-				settingsBox.mainloop()
+				settingsBox.mainloop()  # This needs to be present or else the program will do a nasty infinite loop
+				# We don't need to destroy the window because it will destroy itself when its done,
+				# there by exiting the loop and moving forward
 		else:
 			cls.loadSettings()
 			cls.refreshMessageList()
