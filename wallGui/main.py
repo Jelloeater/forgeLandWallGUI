@@ -19,10 +19,13 @@ class bootloader(messageController):
 			cls.loadSettings()
 			cls.refreshMessageList()
 		else:
-			tkMessageBox.showerror(message='Cannot Reach Server @ ' + 'http://' + cls.serverIp + ':' + cls.port + '/')
-			cls.editSettings()
+			top = Tk()
+			top.withdraw()
+			tkMessageBox.showerror(message='Cannot Reach Server @ ' + 'http://' + cls.serverIp + ':' + cls.port + '/'
+			                               + '\nPlease edit server address')
+			# cls.editSettings()
 			# FIXME Handle inactive server
-
+			top.destroy()
 
 
 	@classmethod
@@ -226,7 +229,6 @@ if __name__ == "__main__":
 	bootloader.startUp()
 
 	# TODO Should we have this disabled on bad startup?
-
 	root = Tk()
 	root.columnconfigure(0, weight=1)
 	# root.rowconfigure(0, weight=1)

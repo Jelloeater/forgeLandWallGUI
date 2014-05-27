@@ -31,14 +31,15 @@ class messageController(message):
 	@classmethod
 	def addMessageToList(cls, messageToAdd):
 		""" Adds the messages to server """
-		if messageToAdd != cls.defaultMessageBoxText and not str(messageToAdd).isspace():
-			logging.debug("Adding " + str(messageToAdd))
-			data = {'create': messageToAdd}
-			requests.post(url=cls.getServerAddress() + 'post', data=data)
-			return True
-		else:
-			logging.warning('User did not enter a non default message')
-			return False
+		if cls.isServerActive():
+			if messageToAdd != cls.defaultMessageBoxText and not str(messageToAdd).isspace():
+				logging.debug("Adding " + str(messageToAdd))
+				data = {'create': messageToAdd}
+				requests.post(url=cls.getServerAddress() + 'post', data=data)
+				return True
+			else:
+				logging.warning('User did not enter a non default message')
+				return False
 
 	@classmethod
 	def editMessage(cls, indexToEdit, newMessage):

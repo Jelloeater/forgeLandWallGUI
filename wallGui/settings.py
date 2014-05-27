@@ -12,7 +12,7 @@ settingsFilePath = "/settings.json"
 
 
 class settings:
-	serverIp = '192.168.1.165'
+	serverIp = '192.168.1.160'
 	port = '9000'
 	numberOfMessagesToGet = 0
 	versionNumber = "v1.5"
@@ -27,7 +27,7 @@ class settings:
 	def isServerActive(cls):
 		logging.debug('Checking server')
 		try:
-			urlopen('http://' + settings.serverIp + ':' + settings.port + '/', timeout=1)
+			urlopen(cls.getServerAddress(), timeout=1)
 			return True
 		except URLError:
 			logging.warning('Cannot Reach Server @ ' + cls.getServerAddress())
@@ -65,14 +65,14 @@ class settings:
 				logging.warning('Invalid Server Address ' + 'http://' + IPAddressBox.get() + ':' + portBox.get() + '/')
 			messageInDialogIn.destroy()
 
-		messageInDialog = Tk()
-		messageInDialog.title('Settings')
-		messageInDialog.wm_iconbitmap(bitmap='images/icon.ico')
-		messageInDialog.columnconfigure(0, weight=1)
-		messageInDialog.rowconfigure(0, weight=1)
+		settingsDialog = Tk()
+		settingsDialog.title('Settings')
+		settingsDialog.wm_iconbitmap(bitmap='images/icon.ico')
+		settingsDialog.columnconfigure(0, weight=1)
+		settingsDialog.rowconfigure(0, weight=1)
 
-		messageInDialog.minsize(width=100, height=50)
-		frame = Frame(messageInDialog)
+		settingsDialog.minsize(width=100, height=50)
+		frame = Frame(settingsDialog)
 
 		label = Label(frame)
 		label['text'] = 'Server Address'
@@ -96,12 +96,12 @@ class settings:
 
 		submitButton = Button(frame)
 		submitButton['text'] = 'Ok'
-		submitButton['command'] = lambda: commitSettings(messageInDialog)
+		submitButton['command'] = lambda: commitSettings(settingsDialog)
 		submitButton.pack(side="left", expand="yes", fill="both", padx=5, pady=3)
 
 		cancelButton = Button(frame)
 		cancelButton['text'] = 'Cancel'
-		cancelButton['command'] = messageInDialog.destroy
+		cancelButton['command'] = settingsDialog.destroy
 		cancelButton.pack(fill='both', expand="yes", padx=5, pady=3)
 
 		frame.pack(fill='both', expand="yes", padx=0, pady=0)
