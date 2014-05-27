@@ -18,14 +18,10 @@ class bootloader(messageController):
 		if cls.isServerActive():
 			cls.loadSettings()
 			cls.refreshMessageList()
-			return True
 		else:
-			top = Tk()
-			top.withdraw()
 			tkMessageBox.showerror(message='Cannot Reach Server @ ' + 'http://' + cls.serverIp + ':' + cls.port + '/')
-
-			cls.editSettings(startup=True)
-			# TODO Handle inactive server
+			cls.editSettings()
+			# FIXME Handle inactive server
 
 
 
@@ -210,8 +206,6 @@ class mainGUI(Frame, messageController):
 		self.hsb.destroy()
 		self.createMessageFrame()
 
-
-
 	def OnFrameConfigure(self, event):
 		"""Reset the scroll region to encompass the inner frame"""
 		self.messageListCanvas.configure(scrollregion=self.messageListCanvas.bbox("all"))
@@ -229,18 +223,19 @@ class mainGUI(Frame, messageController):
 
 if __name__ == "__main__":
 	logging.debug("Started main program")
-	bootStatus = bootloader.startUp()
+	bootloader.startUp()
 
-	if bootStatus:
-		root = Tk()
-		root.columnconfigure(0, weight=1)
-		# root.rowconfigure(0, weight=1)
-		root.geometry("300x250")
-		root.minsize(width=300, height=200)
-		root.title('Forge Land Message Editor ' + mainGUI.versionNumber)
-		root.wm_iconbitmap(bitmap='images/icon.ico')
-		mainGUI(root).grid()
-		root.mainloop()
+	# TODO Should we have this disabled on bad startup?
+
+	root = Tk()
+	root.columnconfigure(0, weight=1)
+	# root.rowconfigure(0, weight=1)
+	root.geometry("300x250")
+	root.minsize(width=300, height=200)
+	root.title('Forge Land Message Editor ' + mainGUI.versionNumber)
+	root.wm_iconbitmap(bitmap='images/icon.ico')
+	mainGUI(root).grid()
+	root.mainloop()
 
 	bootloader.shutDown()
 	logging.debug("End Of Program")

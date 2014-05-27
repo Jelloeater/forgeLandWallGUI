@@ -1,4 +1,5 @@
 from Tkinter import Tk, Frame, Label, Entry, Button
+import tkMessageBox
 from urllib2 import urlopen, URLError
 # import json
 import os
@@ -11,7 +12,7 @@ settingsFilePath = "/settings.json"
 
 
 class settings:
-	serverIp = '192.168.1.160'
+	serverIp = '192.168.1.165'
 	port = '9000'
 	numberOfMessagesToGet = 0
 	versionNumber = "v1.5"
@@ -41,7 +42,7 @@ class settings:
 		# TODO Write JSON based settings save
 
 	@classmethod
-	def editSettings(cls, startup=False):
+	def editSettings(cls):
 
 		def commitSettings(messageInDialogIn):
 			# Temp vars
@@ -52,16 +53,12 @@ class settings:
 			settings.port = portBox.get()
 			logging.critical(IPAddressBox.get())
 
-			logging.critical('NewIP' + settings.serverIp)
-			logging.critical('New Address' + 'http://' + settings.serverIp + ':' + settings.port + '/')
-
 			if not cls.isServerActive():
 				settings.serverIp = ip
 				settings.port = p
+				tkMessageBox.showerror(message='Invalid Server Address ' + 'http://' + IPAddressBox.get() + ':' + portBox.get() + '/')
 				logging.warning('Invalid Server Address ' + 'http://' + cls.serverIp + ':' + cls.port + '/')
-			else:
-				messageInDialogIn.destroy()
-
+			messageInDialogIn.destroy()
 
 		messageInDialog = Tk()
 		messageInDialog.title('Settings')
@@ -103,5 +100,3 @@ class settings:
 		cancelButton.pack(fill='both', expand="yes", padx=5, pady=3)
 
 		frame.pack(fill='both', expand="yes", padx=0, pady=0)
-
-		if startup:messageInDialog.mainloop()
