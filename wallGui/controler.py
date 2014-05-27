@@ -15,14 +15,24 @@ class messageController(message):
 	@classmethod
 	def refreshMessageList(cls):
 		""" Gets the messages from the server and loads them into the model """
-		numberToGet = cls.numberOfMessagesToGet
-		logging.info("Getting " + str(numberToGet) + ' messages from ' + cls.serverAddress)
-		rawJSON = Requests.get(settings.serverAddress + 'get/' + str(numberToGet))
-		messageList = json.loads(rawJSON.content)
 
-		logging.debug("Got " + str(len(messageList)) + " message(s)")
-		message.messageList = messageList
-		return messageList  # For testing and other neat things
+		if cls.isServerActive():
+			numberToGet = cls.numberOfMessagesToGet
+			logging.info("Getting " + str(numberToGet) + ' messages from ' + cls.serverAddress)
+			rawJSON = Requests.get(settings.serverAddress + 'get/' + str(numberToGet))
+			messageList = json.loads(rawJSON.content)
+
+			logging.debug("Got " + str(len(messageList)) + " message(s)")
+			message.messageList = messageList
+			return messageList  # For testing and other neat things
+		else:
+			return False
+
+	@classmethod
+	def isServerActive(cls):
+		logging.debug('Checking server')
+		return True
+	# TODO write server ping code
 
 	@classmethod
 	def addMessageToList(cls, messageToAdd):

@@ -1,7 +1,9 @@
 from Tkinter import *
 import logging
 import tkMessageBox
+
 from controler import messageController
+# from settings import editSettings
 
 
 class bootloader(messageController):
@@ -14,8 +16,14 @@ class bootloader(messageController):
 		# TODO Check if server active
 		# TODO Display error dialog if server cannot be reached
 
-		cls.loadSettings()
-		cls.refreshMessageList()
+		if cls.isServerActive():
+			cls.loadSettings()
+			cls.refreshMessageList()
+		else:
+			pass
+			# TODO Handle inactive server
+
+
 
 	@classmethod
 	def shutDown(cls):
@@ -198,52 +206,7 @@ class mainGUI(Frame, messageController):
 		self.hsb.destroy()
 		self.createMessageFrame()
 
-	def editSettings(self):
 
-		def commitSettings(messageInDialogIn):
-			# TODO Get entry and write settings
-			messageInDialogIn.destroy()
-
-		messageInDialog = Tk()
-		messageInDialog.title('Settings')
-		messageInDialog.wm_iconbitmap(bitmap='images/icon.ico')
-		messageInDialog.columnconfigure(0, weight=1)
-		messageInDialog.rowconfigure(0, weight=1)
-
-		messageInDialog.minsize(width=100, height=50)
-		frame = Frame(messageInDialog)
-
-		label = Label(frame)
-		label['text'] = 'Server Address'
-		label.pack()
-
-		IPAddressBox = Entry(frame)
-		IPAddressBox.insert(0, self.serverIp)
-		IPAddressBox.pack(fill='both')
-
-		portLabel = Label(frame)
-		portLabel['text'] = 'Server Port'
-		portLabel.pack()
-
-
-		portBox = Entry(frame)
-		portBox.insert(0, self.port)
-		portBox.pack(fill='both')
-
-		label['text'] = 'Server Port'
-		label.pack()
-
-		submitButton = Button(frame)
-		submitButton['text'] = 'Ok'
-		submitButton['command'] = lambda: commitSettings(messageInDialog)
-		submitButton.pack(side="left", expand="yes", fill="both", padx=5, pady=3)
-
-		cancelButton = Button(frame)
-		cancelButton['text'] = 'Cancel'
-		cancelButton['command'] = messageInDialog.destroy
-		cancelButton.pack(fill='both', expand="yes", padx=5, pady=3)
-
-		frame.pack(fill='both', expand="yes", padx=0, pady=0)
 
 	def OnFrameConfigure(self, event):
 		"""Reset the scroll region to encompass the inner frame"""
