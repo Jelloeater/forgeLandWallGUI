@@ -1,22 +1,31 @@
 from Tkinter import Tk, Frame, Label, Entry, Button
 import tkMessageBox
 from urllib2 import urlopen, URLError
-# import json
+import json
 import os
 
 __author__ = 'Jesse'
 import logging
 logging.basicConfig(format="[%(asctime)s] [%(levelname)8s] --- %(message)s (%(filename)s:%(lineno)s)", level=logging.DEBUG)
 
-settingsFilePath = "/settings.json"
+settingsFilePath = "settings.json"
 
 
-class settings:
-	serverIp = '192.168.1.160'
+class settingsVars:
+	serverIp = '192.168.1.165'
 	port = '9000'
 	numberOfMessagesToGet = 0
-	versionNumber = "v1.5"
+	versionNumber = "v1.6"
 	defaultMessageBoxText = 'Enter Message / Search'
+
+
+class settings(settingsVars):
+
+
+	@classmethod
+	def getDict(cls, obj):
+		"""The default encoder to take the object instances	fields as JSON fields"""
+		return obj.__dict__
 
 	@classmethod
 	def getServerAddress(cls):
@@ -33,18 +42,25 @@ class settings:
 			logging.warning('Cannot Reach Server @ ' + cls.getServerAddress())
 			return False
 
+
 	@classmethod
 	def loadSettings(cls):
-		if not os.path.isfile(settingsFilePath):
-			logging.warn("Settings missing, defaults set")
+		if os.path.isfile(settingsFilePath):
+			fh = open(settingsFilePath, mode='r')
+			settingsVars.__dict__ = json.loads(fh.read())
+			fh.close()
+			logging.info("Settings loaded")
 		else:
-			pass
-			# TODO Write JSON based settings load
+			logging.warn("Settings missing, defaults set")
+
 
 	@classmethod
 	def saveSettings(cls):
+		fh = open(settingsFilePath, mode='w')
+		fh.write(json.dumps(settingsVars.__dict__, sort_keys=True))
+		fh.close()
 		logging.info("Settings saved")
-		# TODO Write JSON based settings save
+
 
 	@classmethod
 	def editSettings(cls):
@@ -54,13 +70,13 @@ class settings:
 			ip = settings.serverIp
 			p = settings.port
 
-			settings.serverIp = IPAddressBox.get()
-			settings.port = portBox.get()
-			logging.critical(IPAddressBox.get())
+			settingsVars.serverIp = IPAddressBox.get()
+			settingsVars.port = portBox.get()
+			settingsVars.numberOfMessagesToGet = numberToGetBox.get()
 
 			if not cls.isServerActive():
-				settings.serverIp = ip
-				settings.port = p
+				settingsVars.serverIp = ip
+				settingsVars.port = p
 				tkMessageBox.showerror(message='Invalid Server Address ' + 'http://' + IPAddressBox.get() + ':' + portBox.get() + '/')
 				logging.warning('Invalid Server Address ' + 'http://' + IPAddressBox.get() + ':' + portBox.get() + '/')
 			messageInDialogIn.destroy()
@@ -74,9 +90,9 @@ class settings:
 		settingsDialog.minsize(width=100, height=50)
 		frame = Frame(settingsDialog)
 
-		label = Label(frame)
-		label['text'] = 'Server Address'
-		label.pack()
+		addressLabel = Label(frame)
+		addressLabel['text'] = 'Server Address'
+		addressLabel.pack()
 
 		IPAddressBox = Entry(frame)
 		IPAddressBox.insert(0, cls.serverIp)
@@ -86,13 +102,17 @@ class settings:
 		portLabel['text'] = 'Server Port'
 		portLabel.pack()
 
-
 		portBox = Entry(frame)
 		portBox.insert(0, cls.port)
 		portBox.pack(fill='both')
 
-		label['text'] = 'Server Port'
-		label.pack()
+		numberToGetLabel = Label(frame)
+		numberToGetLabel['text'] = '# of Messages To Get'
+		numberToGetLabel.pack()
+
+		numberToGetBox = Entry(frame)
+		numberToGetBox.insert(0, cls.numberOfMessagesToGet)
+		numberToGetBox.pack(fill='both')
 
 		submitButton = Button(frame)
 		submitButton['text'] = 'Ok'

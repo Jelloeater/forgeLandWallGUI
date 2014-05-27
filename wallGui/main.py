@@ -13,7 +13,7 @@ class bootloader(messageController):
 	@classmethod
 	def startUp(cls):
 		logging.debug('Started Boot loader')
-
+		cls.loadSettings()
 		while not cls.isServerActive():
 				top = Tk()
 				top.withdraw()
@@ -26,7 +26,6 @@ class bootloader(messageController):
 				# We don't need to destroy the window because it will destroy itself when its done,
 				# there by exiting the loop and moving forward
 		else:
-			cls.loadSettings()
 			cls.refreshMessageList()
 
 	@classmethod
