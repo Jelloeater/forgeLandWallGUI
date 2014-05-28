@@ -1,6 +1,7 @@
 from Tkinter import *
 import logging
 import tkMessageBox
+import os
 
 from controler import messageController
 # from settings import editSettings
@@ -36,7 +37,8 @@ class bootloader(messageController):
 		cls.root.geometry("300x250")
 		cls.root.minsize(width=300, height=200)
 		cls.root.title('Forge Land Message Editor ' + mainGUI.versionNumber)
-		cls.root.wm_iconbitmap(bitmap='images/icon.ico')
+		if os.name == "nt":
+			cls.root.wm_iconbitmap(bitmap='images/icon.ico')
 		mainGUI(cls.root).grid()
 		cls.root.mainloop()
 
@@ -171,7 +173,8 @@ class mainGUI(Frame, messageController, bootloader):
 
 		messageInDialog = Tk()
 		messageInDialog.title('Edit Message')
-		messageInDialog.wm_iconbitmap(bitmap='images/icon.ico')
+		if os.name == "nt":
+			messageInDialog.wm_iconbitmap(bitmap='images/icon.ico')
 		messageInDialog.columnconfigure(0, weight=1)
 		messageInDialog.rowconfigure(0, weight=1)
 

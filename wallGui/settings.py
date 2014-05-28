@@ -6,6 +6,7 @@ import os
 
 __author__ = 'Jesse'
 import logging
+import os
 logging.basicConfig(format="[%(asctime)s] [%(levelname)8s] --- %(message)s (%(filename)s:%(lineno)s)", level=logging.DEBUG)
 
 settingsFilePath = "settings.json"
@@ -83,7 +84,8 @@ class settings(settingsVars):
 
 		settingsDialog = Tk()
 		settingsDialog.title('Settings')
-		settingsDialog.wm_iconbitmap(bitmap='images/icon.ico')
+		if os.name == "nt":
+			settingsDialog.wm_iconbitmap(bitmap='images/icon.ico')
 		settingsDialog.columnconfigure(0, weight=1)
 		settingsDialog.rowconfigure(0, weight=1)
 
