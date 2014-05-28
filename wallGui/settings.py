@@ -58,7 +58,7 @@ class settings(settingsVars):
 	@classmethod
 	def saveSettings(cls):
 		fh = open(settingsFilePath, mode='w')
-		fh.write(json.dumps(settingsVars.__dict__, sort_keys=True))
+		fh.write(json.dumps(settingsVars.__dict__, sort_keys=True, indent=0))
 		fh.close()
 		logging.info("Settings saved")
 
