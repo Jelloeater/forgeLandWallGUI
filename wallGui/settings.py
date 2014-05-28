@@ -15,7 +15,7 @@ class settingsVars:
 	serverIp = '192.168.1.165'
 	port = '9000'
 	numberOfMessagesToGet = 0
-	versionNumber = "v1.6"
+	versionNumber = "v1.65"
 	defaultMessageBoxText = 'Enter Message / Search'
 
 
