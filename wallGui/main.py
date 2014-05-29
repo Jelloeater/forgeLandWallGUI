@@ -76,7 +76,6 @@ class mainGUI(Frame, messageController, bootloader):
 		self.helpMenu.add_command(label="About", command=self.aboutBox, underline=1)
 		self.master.config(menu=self.menuBar)
 
-
 		self.topFrame = Frame()
 		self.entryBox = Entry(self.topFrame)
 		self.entryBox.insert(0, self.defaultMessageBoxText)
@@ -93,6 +92,7 @@ class mainGUI(Frame, messageController, bootloader):
 		self.searchButton['text'] = 'Search'
 		self.searchButton['command'] = lambda: self.searchMessage_GUI(self.entryBox.get())
 		self.searchButton.pack(side='right', padx=0)
+		# FIXME Pause refresh while searching for messages
 
 		self.topFrame.pack(fill='x')
 
