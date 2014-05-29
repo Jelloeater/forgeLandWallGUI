@@ -2,15 +2,16 @@ import json
 import logging
 import requests as Requests
 from settings import settings
-
-__author__ = 'Jesse'
-
 from model import message
 import requests
+import threading
+
+__author__ = 'Jesse'
 
 
 class messageController(message):
 	""" Mediates communication and unifies validation, using direct calls """
+	autoRefreshLock = threading.Lock()  # Refresh lock object used to mediate application
 
 	@classmethod
 	def refreshMessageList(cls):
@@ -63,6 +64,7 @@ class messageController(message):
 	@classmethod
 	def searchMessage(cls, messageToSearchFor):
 		""" Search for message and return query """
+		logging.debug('*REFRESH LOCK STATUS* = ' + str(cls.autoRefreshLock.locked()))
 		if messageToSearchFor != '' and messageToSearchFor is not None and not str(messageToSearchFor).isspace():
 			logging.debug('Searching for: ' + messageToSearchFor)
 

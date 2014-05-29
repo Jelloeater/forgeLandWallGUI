@@ -11,7 +11,6 @@ from controler import messageController
 
 class bootloader(messageController):
 
-	autoRefreshLock = threading.Lock()
 
 	def __init__(self):
 		pass
@@ -21,16 +20,16 @@ class bootloader(messageController):
 		logging.debug('Started Boot loader')
 		cls.loadSettings()
 		while not cls.isServerActive():
-				top = Tk()
-				top.withdraw()
-				tkMessageBox.showerror(message='Cannot Reach Server @ ' + 'http://' + cls.serverIp + ':' + cls.port + '/'
-				                               + '\nPlease edit server address')
-				top.destroy()
+			top = Tk()
+			top.withdraw()
+			tkMessageBox.showerror(message='Cannot Reach Server @ ' + 'http://' + cls.serverIp + ':' + cls.port + '/'
+			                               + '\nPlease edit server address')
+			top.destroy()
 
-				settingsBox = cls.editSettings()
-				settingsBox.mainloop()  # This needs to be present or else the program will do a nasty infinite loop
-				# We don't need to destroy the window because it will destroy itself when its done,
-				# there by exiting the loop and moving forward
+			settingsBox = cls.editSettings()
+			settingsBox.mainloop()  # This needs to be present or else the program will do a nasty infinite loop
+		# We don't need to destroy the window because it will destroy itself when its done,
+		# there by exiting the loop and moving forward
 		else:
 			cls.refreshMessageList()
 
@@ -59,14 +58,15 @@ class bootloader(messageController):
 		def refreshLoop(mainGUIObjRef):
 			while True:
 				cls.autoRefreshLock.acquire()
+				logging.debug('*REFRESH LOCK STATUS* = ' + str(cls.autoRefreshLock.locked()))
 				mainGUIObjRef.refreshGUI()
 				cls.autoRefreshLock.release()
+				logging.debug('*REFRESH LOCK STATUS* = ' + str(cls.autoRefreshLock.locked()))
 				time.sleep(cls.refreshInterval)
 
 		t = threading.Thread(target=refreshLoop, args=(mainGUIObj,))
 		t.daemon = True
 		t.start()
-
 
 
 class mainGUI(Frame, messageController, bootloader):
@@ -118,16 +118,17 @@ class mainGUI(Frame, messageController, bootloader):
 		self.createMessageFrame()
 
 
+	# TODO Add status bar
 
-		# TODO Add status bar
-
-		# self.statusBar = Frame()
-		# self.status = Label(self.statusBar)
-		# self.status['text'] = "Ok"
-		# self.status.pack(side='bottom', padx=5)
-		# self.statusBar.pack(side='bottom', fill='x', expand='True', padx=5)
+	# self.statusBar = Frame()
+	# self.status = Label(self.statusBar)
+	# self.status['text'] = "Ok"
+	# self.status.pack(side='bottom', padx=5)
+	# self.statusBar.pack(side='bottom', fill='x', expand='True', padx=5)
 
 	# noinspection PyAttributeOutsideInit
+
+
 	def createMessageFrame(self):
 		# Sets up frame
 		self.messageListCanvas = Canvas(self.root, borderwidth=0)
@@ -178,7 +179,7 @@ class mainGUI(Frame, messageController, bootloader):
 	def addMessage_GUI(self, messageToAdd):
 		status = self.addMessageToList(messageToAdd)
 		if not status:
-			tkMessageBox.showerror('Error','Message invalid')
+			tkMessageBox.showerror('Error', 'Message invalid')
 		self.entryBox.select_range(0, END)  # Selects the contents so the user can just type the next message
 		self.refreshGUI()
 
@@ -224,12 +225,12 @@ class mainGUI(Frame, messageController, bootloader):
 
 		frame.pack(fill='both', expand="yes", padx=0, pady=0)
 
-
 	def deleteMessage_GUI(self, c):
 		self.deleteMessage(indexToDelete=c['index'])
 		self.refreshGUI()
 
 	def searchMessage_GUI(self, messageToSearchFor):
+		self.autoRefreshLock.acquire()  # Stops auto refresh
 		logging.debug('Refreshing Message Window - Search')
 		self.searchMessage(messageToSearchFor)
 		self.refresh_GUI_Window()
@@ -253,7 +254,7 @@ class mainGUI(Frame, messageController, bootloader):
 
 	def aboutBox(self):
 		message = 'A simple GET/POST front end for a message server API. \nBy Jesse S \n' + self.versionNumber \
-				+ '\nhttp://bitbucket.org/Jelloeater/forgelandwallgui'
+		          + '\nhttp://bitbucket.org/Jelloeater/forgelandwallgui'
 		tkMessageBox.showinfo(title='About', message=message)
 
 	@staticmethod
