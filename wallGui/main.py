@@ -41,13 +41,26 @@ class bootloader(messageController):
 		cls.root.title('Forge Land Message Editor ' + mainGUI.versionNumber)
 		if os.name == "nt":
 			cls.root.wm_iconbitmap(bitmap='images/icon.ico')
-		mainGUI(cls.root).grid()
+		cls.mainGUIObj = mainGUI(cls.root)
+		cls.mainGUIObj.grid()
+		cls.autoRefresh(cls.mainGUIObj)
 		cls.root.mainloop()
 
 	@classmethod
 	def shutDown(cls):
 		logging.debug('Shutting down')
 		cls.saveSettings()
+
+	@classmethod
+	def autoRefresh(cls, mainGUIObj):
+		def refreshLoop(mainGUIObjRef):
+			while True:
+				mainGUIObjRef.refreshGUI()
+				time.sleep(cls.refreshInterval)
+
+		t = threading.Thread(target=refreshLoop, args=(mainGUIObj,))
+		t.daemon = True
+		t.start()
 
 
 class mainGUI(Frame, messageController, bootloader):
@@ -98,7 +111,7 @@ class mainGUI(Frame, messageController, bootloader):
 
 		self.createMessageFrame()
 
-		self.autoRefresh()  # Starts auto refresh thread in background
+
 
 		# TODO Add status bar
 
@@ -241,16 +254,6 @@ class mainGUI(Frame, messageController, bootloader):
 	def programHelp():
 		message = 'Press button \nReceive message'
 		tkMessageBox.showinfo(title='About', message=message)
-
-	def autoRefresh(self):
-		def refreshLoop():
-			while True:
-				self.refreshGUI()
-				time.sleep(self.refreshInterval)
-
-		t = threading.Thread(target=refreshLoop)
-		t.daemon = True
-		t.start()
 
 
 if __name__ == "__main__":
