@@ -2,6 +2,8 @@ from Tkinter import *
 import logging
 import tkMessageBox
 import os
+import threading
+import time
 
 from controler import messageController
 # from settings import editSettings
@@ -95,6 +97,8 @@ class mainGUI(Frame, messageController, bootloader):
 		self.topFrame.pack(fill='x')
 
 		self.createMessageFrame()
+
+		self.autoRefresh()  # Starts auto refresh thread in background
 
 		# TODO Add status bar
 
@@ -237,6 +241,16 @@ class mainGUI(Frame, messageController, bootloader):
 	def programHelp():
 		message = 'Press button \nReceive message'
 		tkMessageBox.showinfo(title='About', message=message)
+
+	def autoRefresh(self):
+		def refreshLoop():
+			while True:
+				self.refreshGUI()
+				time.sleep(self.refreshInterval)
+
+		t = threading.Thread(target=refreshLoop)
+		t.daemon = True
+		t.start()
 
 
 if __name__ == "__main__":

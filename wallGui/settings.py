@@ -18,10 +18,10 @@ class settingsVars:
 	numberOfMessagesToGet = 0
 	versionNumber = "v1.65"
 	defaultMessageBoxText = 'Enter Message / Search'
+	refreshInterval = 5
 
 
 class settings(settingsVars):
-
 
 	@classmethod
 	def getDict(cls, obj):
@@ -73,7 +73,8 @@ class settings(settingsVars):
 
 			settingsVars.serverIp = IPAddressBox.get()
 			settingsVars.port = portBox.get()
-			settingsVars.numberOfMessagesToGet = numberToGetBox.get()
+			settingsVars.numberOfMessagesToGet = int(numberToGetBox.get())
+			settingsVars.refreshInterval = int(refreshIntervalBox.get())
 
 			if not cls.isServerActive():
 				settingsVars.serverIp = ip
@@ -115,6 +116,14 @@ class settings(settingsVars):
 		numberToGetBox = Entry(frame)
 		numberToGetBox.insert(0, cls.numberOfMessagesToGet)
 		numberToGetBox.pack(fill='both')
+
+		refreshIntervalLabel = Label(frame)
+		refreshIntervalLabel['text'] = 'Refresh Interval'
+		refreshIntervalLabel.pack()
+
+		refreshIntervalBox = Entry(frame)
+		refreshIntervalBox.insert(0, cls.refreshInterval)
+		refreshIntervalBox.pack(fill='both')
 
 		submitButton = Button(frame)
 		submitButton['text'] = 'Ok'
