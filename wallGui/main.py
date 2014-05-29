@@ -10,6 +10,9 @@ from controler import messageController
 
 
 class bootloader(messageController):
+
+	autoRefreshLock = threading.Lock()
+
 	def __init__(self):
 		pass
 
@@ -55,12 +58,15 @@ class bootloader(messageController):
 	def autoRefresh(cls, mainGUIObj):
 		def refreshLoop(mainGUIObjRef):
 			while True:
+				cls.autoRefreshLock.acquire()
 				mainGUIObjRef.refreshGUI()
+				cls.autoRefreshLock.release()
 				time.sleep(cls.refreshInterval)
 
 		t = threading.Thread(target=refreshLoop, args=(mainGUIObj,))
 		t.daemon = True
 		t.start()
+
 
 
 class mainGUI(Frame, messageController, bootloader):
