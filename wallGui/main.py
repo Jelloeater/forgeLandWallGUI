@@ -10,8 +10,9 @@ from controler import messageController
 
 
 class bootloader(messageController):
+	""" Helps both start AND stop the application """
 	def __init__(self):
-		pass
+		messageController.__init__(self)
 
 	@classmethod
 	def startUp(cls):
@@ -41,7 +42,7 @@ class bootloader(messageController):
 		cls.root.title('Forge Land Message Editor ' + mainGUI.versionNumber)
 		if os.name == "nt":
 			cls.root.wm_iconbitmap(bitmap='images/icon.ico')
-		cls.mainGUIObj = mainGUI(cls.root)
+		cls.mainGUIObj = mainGUI()
 		cls.mainGUIObj.grid()
 		cls.autoRefresh(cls.mainGUIObj)
 		cls.root.mainloop()
@@ -53,18 +54,15 @@ class bootloader(messageController):
 
 	@classmethod
 	def autoRefresh(cls, mainGUIObj):
+		""" Starts the refresh background thread """
 		def refreshLoop(mainGUIObjRef):
 			while True:
 				cls.autoRefreshLock.acquire()
-				# logging.debug('*REFRESH LOCK STATUS* = ' + str(cls.autoRefreshLock.locked()))
-				# logging.debug(mainGUIObj.searchFlag)
-				# logging.debug(mainGUIObj.searchField)
 				if mainGUIObj.isValidSearchInEntryBox():
 					mainGUIObjRef.searchMessage_GUI()
 				else:
 					mainGUIObjRef.refresh_GUI()
 				cls.autoRefreshLock.release()
-				# logging.debug('*REFRESH LOCK STATUS* = ' + str(cls.autoRefreshLock.locked()))
 				time.sleep(cls.refreshInterval)
 
 		t = threading.Thread(target=refreshLoop, args=(mainGUIObj,))
@@ -73,7 +71,9 @@ class bootloader(messageController):
 
 
 class mainGUI(Frame, messageController, bootloader):
-	def __init__(self, rootWindow):
+	""" Contains the main view for the application """
+	def __init__(self):
+		""" Create the initial application GUI environment (tool bars, and other static elements) """
 		Frame.__init__(self, self.root)
 		self.searchField = ''  # Hold both search string, and drives autoRefresh logic
 
@@ -121,7 +121,6 @@ class mainGUI(Frame, messageController, bootloader):
 
 		self.createMessageFrame()
 
-
 	# TODO Add status bar
 
 	# self.statusBar = Frame()
@@ -133,6 +132,8 @@ class mainGUI(Frame, messageController, bootloader):
 	# noinspection PyAttributeOutsideInit
 
 	def createMessageFrame(self):
+		""" Sets up the main message frame (where the magic happens) """
+
 		# Sets up frame
 		self.messageListCanvas = Canvas(self.root, borderwidth=0)
 		self.messageListFrame = Frame(self.messageListCanvas)
@@ -153,11 +154,12 @@ class mainGUI(Frame, messageController, bootloader):
 
 		self.messageListBox()
 
-	def OnFrameConfigure(self, event):
+	def OnFrameConfigure(self):
 		"""Reset the scroll region to encompass the inner frame"""
 		self.messageListCanvas.configure(scrollregion=self.messageListCanvas.bbox("all"))
 
 	def messageListBox(self):
+		""" Creates the message list box for the createMessageFrame method """
 		messagesToLoad = self.messageList  # Fetch Message List from model
 
 		for i in messagesToLoad:
@@ -174,15 +176,14 @@ class mainGUI(Frame, messageController, bootloader):
 
 			editButton = Button(self.messageListFrame)
 			editButton['text'] = 'Edit'
-			editButton['command'] = lambda i=i: self.editMessage_GUI(i)  # Self referencing callback function
+			editButton['command'] = lambda messageIn=i: self.editMessage_GUI(
+				messageIn)  # Self referencing callback function
 			editButton.grid(column=2, row=rowToInsertAt, sticky='e')
 
 			deleteButton = Button(self.messageListFrame)
 			deleteButton['text'] = 'Delete'
-			deleteButton['command'] = lambda i=i: self.deleteMessage_GUI(i)
+			deleteButton['command'] = lambda messageIn=i: self.deleteMessage_GUI(messageIn)
 			deleteButton.grid(column=3, row=rowToInsertAt, sticky='e', padx=10)
-		# logging.debug(i)
-		# logging.debug(rowToInsertAt)
 
 	def addMessage_GUI(self):
 		status = self.addMessageToList(self.entryBox.get())
@@ -239,9 +240,6 @@ class mainGUI(Frame, messageController, bootloader):
 
 	def searchFieldSet_GUI(self):
 		""" Sets self object search field (used by auto refresh) """
-		# logging.debug('*****************************************************')
-		# logging.debug(str(self.searchField).isspace())
-
 		if self.isValidSearchInEntryBox():
 			self.searchField = self.entryBox.get()
 			self.searchMessage_GUI()
@@ -263,7 +261,6 @@ class mainGUI(Frame, messageController, bootloader):
 
 	def refresh_GUI(self):
 		""" Refreshes the message list AND GUI window (used by auto refresh)"""
-		# logging.debug('Refreshing Message Window')
 		self.refreshMessageList()
 		self.refresh_GUI_Window()
 
