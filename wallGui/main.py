@@ -4,9 +4,7 @@ import tkMessageBox
 import os
 import threading
 import time
-
 from controler import messageController
-# from settings import editSettings
 
 
 class bootloader(messageController):
@@ -91,7 +89,6 @@ class mainGUI(Frame, messageController, bootloader):
 
 		self.optionsMenu = Menu(self.menuBar, tearoff=0)
 		self.menuBar.add_cascade(label="Options", menu=self.optionsMenu)
-		self.optionsMenu.add_command(label="Refresh", command=self.refresh_GUI, underline=1)
 		self.optionsMenu.add_command(label="Settings", command=self.editSettings, underline=1)
 		self.helpMenu = Menu(self.menuBar, tearoff=0)
 		self.menuBar.add_cascade(label="Help", menu=self.helpMenu)
@@ -115,7 +112,6 @@ class mainGUI(Frame, messageController, bootloader):
 		self.searchButton['text'] = 'Search'
 		self.searchButton['command'] = lambda: self.searchFieldSet_GUI()
 		self.searchButton.pack(side='right', padx=0)
-		# FIXME Pause refresh while searching for messages
 
 		self.topFrame.pack(fill='x')
 
@@ -154,7 +150,7 @@ class mainGUI(Frame, messageController, bootloader):
 
 		self.messageListBox()
 
-	def OnFrameConfigure(self):
+	def OnFrameConfigure(self, event):
 		"""Reset the scroll region to encompass the inner frame"""
 		self.messageListCanvas.configure(scrollregion=self.messageListCanvas.bbox("all"))
 
@@ -193,6 +189,7 @@ class mainGUI(Frame, messageController, bootloader):
 		self.refresh_GUI()
 
 	def editMessage_GUI(self, messageRecordIn):
+		self.autoRefreshLock.acquire()  # Locks auto refresh to prevent GUI redraw errors
 
 		def editMessage_GUI_Ok_Command(messageInDialogIn):
 			if messageRecordIn['message'] != textBox.get():
@@ -203,6 +200,7 @@ class mainGUI(Frame, messageController, bootloader):
 			else:
 				tkMessageBox.showerror(message='Enter a new message')
 			messageInDialogIn.destroy()
+			self.autoRefreshLock.release() # Releases lock on edit box exit
 
 		messageInDialog = Tk()
 		messageInDialog.title('Edit Message')
