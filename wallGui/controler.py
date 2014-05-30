@@ -19,11 +19,11 @@ class messageController(message):
 
 		if settings.isServerActive():
 			numberToGet = cls.numberOfMessagesToGet
-			logging.info("Getting " + str(numberToGet) + ' messages from ' + 'http://' + cls.serverIp + ':' + cls.port + '/')
+			# logging.info("Getting " + str(numberToGet) + ' messages from ' + 'http://' + cls.serverIp + ':' + cls.port + '/')
 			rawJSON = Requests.get(cls.getServerAddress() + 'get/' + str(numberToGet))
 			messageList = json.loads(rawJSON.content)
 
-			logging.debug("Got " + str(len(messageList)) + " message(s)")
+			# logging.debug("Got " + str(len(messageList)) + " message(s)")
 			message.messageList = messageList
 			return messageList  # For testing and other neat things
 		else:
@@ -68,6 +68,7 @@ class messageController(message):
 		if messageToSearchFor != '' and messageToSearchFor is not None and not str(messageToSearchFor).isspace():
 			logging.debug('Searching for: ' + messageToSearchFor)
 
+			# FIXME handle search items not found
 			rawJSON = Requests.get(cls.getServerAddress() + 'query/' + str(messageToSearchFor))
 			messageList = json.loads(rawJSON.content)
 			logging.debug("Got " + str(len(messageList)) + " message(s)")

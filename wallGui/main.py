@@ -56,10 +56,15 @@ class bootloader(messageController):
 		def refreshLoop(mainGUIObjRef):
 			while True:
 				cls.autoRefreshLock.acquire()
-				logging.debug('*REFRESH LOCK STATUS* = ' + str(cls.autoRefreshLock.locked()))
-				mainGUIObjRef.refreshGUI()
+				# logging.debug('*REFRESH LOCK STATUS* = ' + str(cls.autoRefreshLock.locked()))
+				logging.debug(mainGUIObj.searchFlag)
+				logging.debug(mainGUIObj.searchField)
+				if mainGUIObj.searchFlag:
+					mainGUIObjRef.searchMessage_GUI()
+				else:
+					mainGUIObjRef.refresh_GUI()
 				cls.autoRefreshLock.release()
-				logging.debug('*REFRESH LOCK STATUS* = ' + str(cls.autoRefreshLock.locked()))
+				# logging.debug('*REFRESH LOCK STATUS* = ' + str(cls.autoRefreshLock.locked()))
 				time.sleep(cls.refreshInterval)
 
 		t = threading.Thread(target=refreshLoop, args=(mainGUIObj,))
@@ -70,6 +75,8 @@ class bootloader(messageController):
 class mainGUI(Frame, messageController, bootloader):
 	def __init__(self, rootWindow):
 		Frame.__init__(self, self.root)
+		self.searchFlag = False
+		self.searchField = ''
 
 		self.menuBar = Menu()
 		self.fileMenu = Menu(self.menuBar, tearoff=0)
@@ -85,7 +92,7 @@ class mainGUI(Frame, messageController, bootloader):
 
 		self.optionsMenu = Menu(self.menuBar, tearoff=0)
 		self.menuBar.add_cascade(label="Options", menu=self.optionsMenu)
-		self.optionsMenu.add_command(label="Refresh", command=self.refreshGUI, underline=1)
+		self.optionsMenu.add_command(label="Refresh", command=self.refresh_GUI, underline=1)
 		self.optionsMenu.add_command(label="Settings", command=self.editSettings, underline=1)
 		self.helpMenu = Menu(self.menuBar, tearoff=0)
 		self.menuBar.add_cascade(label="Help", menu=self.helpMenu)
@@ -107,7 +114,7 @@ class mainGUI(Frame, messageController, bootloader):
 
 		self.searchButton = Button(self.topFrame)
 		self.searchButton['text'] = 'Search'
-		self.searchButton['command'] = lambda: self.searchMessage_GUI()
+		self.searchButton['command'] = lambda: self.searchFieldSet_GUI()
 		self.searchButton.pack(side='right', padx=0)
 		# FIXME Pause refresh while searching for messages
 
@@ -160,6 +167,7 @@ class mainGUI(Frame, messageController, bootloader):
 			messageText = Label(self.messageListFrame)
 			messageText['text'] = i['message']
 			messageText.grid(column=0, row=rowToInsertAt, sticky='w', padx=0)
+			# TODO Causing crash when user refreshes too fast ?
 
 			timestampText = Label(self.messageListFrame)
 			timestampText['text'] = i['timestamp']
@@ -178,11 +186,12 @@ class mainGUI(Frame, messageController, bootloader):
 		# logging.debug(rowToInsertAt)
 
 	def addMessage_GUI(self):
+		self.searchFlag = False
 		status = self.addMessageToList(self.entryBox.get())
 		if not status:
 			tkMessageBox.showerror('Error', 'Message invalid')
 		self.entryBox.select_range(0, END)  # Selects the contents so the user can just type the next message
-		self.refreshGUI()
+		self.refresh_GUI()
 
 	def editMessage_GUI(self, messageRecordIn):
 
@@ -191,7 +200,7 @@ class mainGUI(Frame, messageController, bootloader):
 				status = self.editMessage(indexToEdit=messageRecordIn['index'], newMessage=textBox.get())
 				if not status:
 					tkMessageBox.showerror('Error', 'Blank message')
-				self.refreshGUI()
+				self.refresh_GUI()
 			else:
 				tkMessageBox.showerror(message='Enter a new message')
 			messageInDialogIn.destroy()
@@ -228,28 +237,39 @@ class mainGUI(Frame, messageController, bootloader):
 
 	def deleteMessage_GUI(self, c):
 		self.deleteMessage(indexToDelete=c['index'])
-		self.refreshGUI()
+		self.refresh_GUI()
+
+	def searchFieldSet_GUI(self):
+		""" Sets self object search field (used by auto refresh) """
+		logging.debug('*****************************************************')
+		logging.debug(str(self.searchField).isspace())
+		self.searchField = self.entryBox.get()
+		if not str(self.searchField).isspace() or self.searchField == '':
+			self.searchFlag = True
+			self.searchMessage_GUI()
+		else:
+			self.searchFlag = False
+			self.refresh_GUI()
 
 	def searchMessage_GUI(self):
-		self.autoRefreshLock.acquire()  # Stops auto refresh
+		""" End action by either pressing search or auto refresh re-searching again"""
 		logging.debug('Refreshing Message Window - Search')
-		self.searchMessage(self.mainGUIObj.entryBox.get())
+		self.searchMessage(self.searchField)
 		self.refresh_GUI_Window()
 
-	def refreshGUI(self):
-		""" Refreshes the message list AND GUI window"""
-		logging.debug('Refreshing Message Window')
+	def refresh_GUI(self):
+		""" Refreshes the message list AND GUI window (used by auto refresh)"""
+		# logging.debug('Refreshing Message Window')
+		self.searchFlag = False
 		self.refreshMessageList()
 		self.refresh_GUI_Window()
 
 	def refresh_GUI_Window(self):
 		""" Refreshes just the GUI window"""
-		logging.debug('*REFRESH LOCK STATUS* = ' + str(self.autoRefreshLock.locked()))
 		self.messageListCanvas.destroy()
 		self.vsb.destroy()
 		self.hsb.destroy()
 		self.createMessageFrame()
-		logging.debug('*REFRESH LOCK STATUS* = ' + str(self.autoRefreshLock.locked()))
 
 	def aboutBox(self):
 		message = 'A simple GET/POST front end for a message server API. \nBy Jesse S \n' + self.versionNumber \

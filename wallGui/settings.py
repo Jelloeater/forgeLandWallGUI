@@ -35,7 +35,7 @@ class settings(settingsVars):
 
 	@classmethod
 	def isServerActive(cls):
-		logging.debug('Checking server')
+		# logging.debug('Checking server')
 		try:
 			urlopen(cls.getServerAddress(), timeout=1)
 			return True
