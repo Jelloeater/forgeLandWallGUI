@@ -10,8 +10,6 @@ from controler import messageController
 
 
 class bootloader(messageController):
-
-
 	def __init__(self):
 		pass
 
@@ -98,18 +96,18 @@ class mainGUI(Frame, messageController, bootloader):
 		self.topFrame = Frame()
 		self.entryBox = Entry(self.topFrame)
 		self.entryBox.insert(0, self.defaultMessageBoxText)
-		self.entryBox.bind('<Return>', lambda event: self.addMessage_GUI(self.entryBox.get()))
+		self.entryBox.bind('<Return>', lambda event: self.addMessage_GUI())
 		# Bind needs to send the event to the handler
 		self.entryBox.pack(side='left', fill='x', expand='True', padx=5)
 
 		self.addMessage = Button(self.topFrame)
 		self.addMessage['text'] = 'Add New Message'
-		self.addMessage['command'] = lambda: self.addMessage_GUI(self.entryBox.get())
+		self.addMessage['command'] = lambda: self.addMessage_GUI()
 		self.addMessage.pack(side='left', padx=0)
 
 		self.searchButton = Button(self.topFrame)
 		self.searchButton['text'] = 'Search'
-		self.searchButton['command'] = lambda: self.searchMessage_GUI(self.entryBox.get())
+		self.searchButton['command'] = lambda: self.searchMessage_GUI()
 		self.searchButton.pack(side='right', padx=0)
 		# FIXME Pause refresh while searching for messages
 
@@ -127,7 +125,6 @@ class mainGUI(Frame, messageController, bootloader):
 	# self.statusBar.pack(side='bottom', fill='x', expand='True', padx=5)
 
 	# noinspection PyAttributeOutsideInit
-
 
 	def createMessageFrame(self):
 		# Sets up frame
@@ -149,6 +146,10 @@ class mainGUI(Frame, messageController, bootloader):
 		self.messageListFrame.bind("<Configure>", self.OnFrameConfigure)
 
 		self.messageListBox()
+
+	def OnFrameConfigure(self, event):
+		"""Reset the scroll region to encompass the inner frame"""
+		self.messageListCanvas.configure(scrollregion=self.messageListCanvas.bbox("all"))
 
 	def messageListBox(self):
 		messagesToLoad = self.messageList  # Fetch Message List from model
@@ -176,8 +177,8 @@ class mainGUI(Frame, messageController, bootloader):
 		# logging.debug(i)
 		# logging.debug(rowToInsertAt)
 
-	def addMessage_GUI(self, messageToAdd):
-		status = self.addMessageToList(messageToAdd)
+	def addMessage_GUI(self):
+		status = self.addMessageToList(self.entryBox.get())
 		if not status:
 			tkMessageBox.showerror('Error', 'Message invalid')
 		self.entryBox.select_range(0, END)  # Selects the contents so the user can just type the next message
@@ -229,10 +230,10 @@ class mainGUI(Frame, messageController, bootloader):
 		self.deleteMessage(indexToDelete=c['index'])
 		self.refreshGUI()
 
-	def searchMessage_GUI(self, messageToSearchFor):
+	def searchMessage_GUI(self):
 		self.autoRefreshLock.acquire()  # Stops auto refresh
 		logging.debug('Refreshing Message Window - Search')
-		self.searchMessage(messageToSearchFor)
+		self.searchMessage(self.mainGUIObj.entryBox.get())
 		self.refresh_GUI_Window()
 
 	def refreshGUI(self):
@@ -243,14 +244,12 @@ class mainGUI(Frame, messageController, bootloader):
 
 	def refresh_GUI_Window(self):
 		""" Refreshes just the GUI window"""
+		logging.debug('*REFRESH LOCK STATUS* = ' + str(self.autoRefreshLock.locked()))
 		self.messageListCanvas.destroy()
 		self.vsb.destroy()
 		self.hsb.destroy()
 		self.createMessageFrame()
-
-	def OnFrameConfigure(self, event):
-		"""Reset the scroll region to encompass the inner frame"""
-		self.messageListCanvas.configure(scrollregion=self.messageListCanvas.bbox("all"))
+		logging.debug('*REFRESH LOCK STATUS* = ' + str(self.autoRefreshLock.locked()))
 
 	def aboutBox(self):
 		message = 'A simple GET/POST front end for a message server API. \nBy Jesse S \n' + self.versionNumber \
