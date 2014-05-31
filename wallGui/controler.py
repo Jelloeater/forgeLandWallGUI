@@ -67,8 +67,10 @@ class messageController(message):
 		logging.debug('Searching for: ' + messageToSearchFor)
 
 		searchGetObj = Requests.get(cls.getServerAddress() + 'query/' + str(messageToSearchFor))
-		if searchGetObj.content != ']':
+		# When we search for a empty query, we get a 404 Not Found Error -_- (and this makes the JSON parser throw up)
+		if searchGetObj.content != ']' and searchGetObj.content != 'Not Found':
 			logging.debug(searchGetObj.content)
+			logging.debug(searchGetObj.content != ']' and searchGetObj.content != 'Not Found')
 			messageList = json.loads(searchGetObj.content)
 			logging.debug("Got " + str(len(messageList)) + " message(s)")
 			message.messageList = messageList

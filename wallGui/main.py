@@ -56,9 +56,13 @@ class bootloader(messageController):
 		def refreshLoop(mainGUIObjRef):
 			while True:
 				cls.autoRefreshLock.acquire()
-				if mainGUIObj.isValidSearchInEntryBox():
-					mainGUIObjRef.searchMessage_GUI()
+				if mainGUIObj.isValidSearch(mainGUIObjRef.searchField):  # Any "valid" search is triggering this, not foud issue
+					if not mainGUIObjRef.searchMessage_GUI():
+						logging.debug('Auto Searching for: ' + mainGUIObjRef.searchField)
+						mainGUIObjRef.searchField = ''
+						# Mimics the same behavior as searchFieldSet_GUI
 				else:
+					logging.debug('Auto Refreshing')
 					mainGUIObjRef.refresh_GUI()
 				cls.autoRefreshLock.release()
 				time.sleep(cls.refreshInterval)
@@ -182,6 +186,7 @@ class mainGUI(Frame, messageController, bootloader):
 			deleteButton.grid(column=3, row=rowToInsertAt, sticky='e', padx=10)
 
 	def addMessage_GUI(self):
+		# FIXME handle empty new message
 		status = self.addMessageToList(self.entryBox.get())
 		if not status:
 			tkMessageBox.showerror('Error', 'Message invalid')
@@ -238,20 +243,20 @@ class mainGUI(Frame, messageController, bootloader):
 
 	def searchFieldSet_GUI(self):
 		""" Sets self object search field (used by auto refresh) """
-		if self.isValidSearchInEntryBox():
-
+		if self.isValidSearch(self.entryBox.get()):
 			self.searchField = self.entryBox.get()
 			if not self.searchMessage_GUI():  # Runs search query, returns False if nothing found
 				tkMessageBox.showwarning(message='No Results Found')
-				# self.searchField = ''  # Resets search field to empty (which drives auto refresh logic)
+				self.searchField = ''  # Resets search field to empty (which drives auto refresh logic)
 				# FIXME Handle no JSON parse
 				# self.refresh_GUI()
 		else:
 			self.refresh_GUI()
 
-	def isValidSearchInEntryBox(self):
-		""" Parses entry box for valid input """
-		if self.entryBox.get().isspace() or self.entryBox.get() == '' or self.entryBox.get() == self.defaultMessageBoxText:
+	@classmethod
+	def isValidSearch(cls, query):
+		""" Parses for valid input (we should be taking input, not getting input from elsewhere) """
+		if query.isspace() or query == '' or query == cls.defaultMessageBoxText:
 			return False
 		else:
 			return True
