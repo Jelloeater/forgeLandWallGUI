@@ -239,8 +239,13 @@ class mainGUI(Frame, messageController, bootloader):
 	def searchFieldSet_GUI(self):
 		""" Sets self object search field (used by auto refresh) """
 		if self.isValidSearchInEntryBox():
+
 			self.searchField = self.entryBox.get()
-			self.searchMessage_GUI()
+			if not self.searchMessage_GUI():  # Runs search query, returns False if nothing found
+				tkMessageBox.showwarning(message='No Results Found')
+				# self.searchField = ''  # Resets search field to empty (which drives auto refresh logic)
+				# FIXME Handle no JSON parse
+				# self.refresh_GUI()
 		else:
 			self.refresh_GUI()
 
@@ -254,8 +259,9 @@ class mainGUI(Frame, messageController, bootloader):
 	def searchMessage_GUI(self):
 		""" End action by either pressing search or auto refresh re-searching again"""
 		logging.debug('Refreshing Message Window - Search')
-		self.searchMessage(self.searchField)
+		returnVal = self.searchMessage(self.searchField)
 		self.refresh_GUI_Window()
+		return returnVal
 
 	def refresh_GUI(self):
 		""" Refreshes the message list AND GUI window (used by auto refresh)"""

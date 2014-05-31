@@ -62,18 +62,18 @@ class messageController(message):
 
 	@classmethod
 	def searchMessage(cls, messageToSearchFor):
-		""" Search for message and return query """
+		""" Search for message and return query, only takes valid messages """
 		logging.debug('*REFRESH LOCK STATUS* = ' + str(cls.autoRefreshLock.locked()))
-		if messageToSearchFor != '' and messageToSearchFor is not None and not str(messageToSearchFor).isspace():
-			logging.debug('Searching for: ' + messageToSearchFor)
+		logging.debug('Searching for: ' + messageToSearchFor)
 
-			# FIXME handle search items not found
-			rawJSON = Requests.get(cls.getServerAddress() + 'query/' + str(messageToSearchFor))
-			messageList = json.loads(rawJSON.content)
+		searchGetObj = Requests.get(cls.getServerAddress() + 'query/' + str(messageToSearchFor))
+		if searchGetObj.content != ']':
+			logging.debug(searchGetObj.content)
+			messageList = json.loads(searchGetObj.content)
 			logging.debug("Got " + str(len(messageList)) + " message(s)")
 			message.messageList = messageList
 			return messageList  # For testing and other neat things
 		else:
-			cls.refreshMessageList()
-			logging.warning('User entered a blank search')
+			# Does not set json return to model messageList data (we ignore bad input due to not finding any results)
+			logging.info('No Results Found')
 			return False
