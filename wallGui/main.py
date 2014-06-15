@@ -1,3 +1,11 @@
+#!/usr/bin/env python2.7
+"""
+About:
+A Tkinter based GUI to interact with a JSON based REST API, aka a simple frontend for a message bord.
+"""
+__author__ = "Jesse Schoepfer"
+__license__ = "GNU GPL v3.0"
+
 from Tkinter import *
 import logging
 import tkMessageBox
