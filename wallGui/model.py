@@ -1,8 +1,7 @@
 __author__ = 'Jesse'
-from settings import settings
 
 
-class message(settings):
+class message():
 	""" The Data"""
 
 	def __init__(self):

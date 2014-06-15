@@ -12,14 +12,12 @@ import tkMessageBox
 import os
 import threading
 import time
+from settings import settings
 from controler import messageController
 
 
-class bootloader(messageController):
+class bootloader(settings):
 	""" Helps both start AND stop the application """
-	def __init__(self):
-		messageController.__init__(self)
-
 	@classmethod
 	def startUp(cls):
 		logging.debug('Started Boot loader')
@@ -36,7 +34,7 @@ class bootloader(messageController):
 		# We don't need to destroy the window because it will destroy itself when its done,
 		# there by exiting the loop and moving forward
 		else:
-			cls.refreshMessageList()
+			messageController.refreshMessageList()
 
 	@classmethod
 	def runMain(cls):
@@ -63,7 +61,7 @@ class bootloader(messageController):
 		""" Starts the refresh background thread """
 		def refreshLoop(mainGUIObjRef):
 			while True:
-				cls.autoRefreshLock.acquire()
+				messageController.autoRefreshLock.acquire()
 				if mainGUIObj.isValidSearch(mainGUIObjRef.searchField):  # Any "valid" search is triggering this, not foud issue
 					if not mainGUIObjRef.searchMessage_GUI():
 						logging.debug('Auto Searching for: ' + mainGUIObjRef.searchField)
@@ -72,7 +70,7 @@ class bootloader(messageController):
 				else:
 					logging.debug('Auto Refreshing')
 					mainGUIObjRef.refresh_GUI()
-				cls.autoRefreshLock.release()
+				messageController.autoRefreshLock.release()
 				time.sleep(cls.refreshInterval)
 
 		t = threading.Thread(target=refreshLoop, args=(mainGUIObj,))

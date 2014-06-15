@@ -1,18 +1,16 @@
 import json
 import logging
 import requests as Requests
-from settings import settings
 from model import message
 import requests
 import threading
-
+from settings import settings
 __author__ = 'Jesse'
 
 
-class messageController(message):
+class messageController(message, settings):
 	""" Mediates communication and unifies validation, using direct calls """
 	autoRefreshLock = threading.Lock()  # Refresh lock object used to mediate application
-
 	@classmethod
 	def refreshMessageList(cls):
 		""" Gets the messages from the server and loads them into the model """
